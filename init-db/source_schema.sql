@@ -4,7 +4,7 @@ CREATE TABLE customers (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     country TEXT NOT NULL,
-    city TEXT,                     -- ~10% missing
+    city TEXT,                   
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     signup_date DATE NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
