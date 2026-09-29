@@ -34,5 +34,5 @@ CREATE TABLE IF NOT EXISTS bronze.shipments (
 CREATE TABLE IF NOT EXISTS meta.pipeline_checkpoints (
     pipeline_name TEXT PRIMARY KEY,
     watermark TIMESTAMPTZ NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -2,6 +2,7 @@ import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 from typing import Any
+from datetime import datetime
 
 class PostgresLandingStore:
     def __init__(self, conn: psycopg.Connection) -> None:
@@ -19,5 +20,23 @@ class PostgresLandingStore:
                     copy.write_row((Jsonb(record),))
 
         return len(records)
+
+
+class PostgresCheckpointStore:
+    def __init__(self, conn: psycopg.Connection) -> None:
+        self._conn = conn
+
+    def get(self, pipeline_name: str) -> datetime | None:
+        with self._conn.cursor() as cur:
+            cur.execute("SELECT watermark FROM meta.pipeline_checkpoints WHERE pipeline_name = %s", (pipeline_name, ))
+
+            row = cur.fetchone()
+            return row[0] if row else None
+
+    def set(self, pipeline_name: str, watermark: datetime) -> None:
+        with self._conn.cursor() as cur:
+            cur.execute("INSERT INTO meta.pipeline_checkpoints (pipeline_name, watermark) VALUES (%s, %s) ON CONFLICT(pipeline_name) DO UPDATE SET watermark = EXCLUDED.watermark, updated_at = NOW()", (pipeline_name, watermark))
+
+        
         
         

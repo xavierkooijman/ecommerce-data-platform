@@ -1,12 +1,13 @@
 import psycopg
 from psycopg import sql
 from typing import Any
+from datetime import datetime
 
-class IncrementalPostgresExtractor:
+class PostgresIncrementalExtractor:
     def __init__(self, conn: psycopg.Connection) -> None:
         self._conn = conn
 
-    def extract(self, table: str, watermark: str | None, watermark_column: str = "updated_at") -> list[dict[str, Any]]:
+    def extract(self, table: str, watermark: datetime | None, watermark_column: str = "updated_at") -> list[dict[str, Any]]:
         with self._conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
             if watermark is None:
                 query = sql.SQL("SELECT * FROM {}").format(sql.Identifier(table))
