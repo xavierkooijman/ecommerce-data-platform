@@ -1,5 +1,7 @@
-from ecommerce_data_platform.storage.postgres import PostgresLandingStore
 from datetime import date
+
+from ecommerce_data_platform.storage.postgres import PostgresLandingStore
+
 
 def test_persist_customers(postgres_warehouse_conn):
     records = [

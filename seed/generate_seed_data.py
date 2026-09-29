@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, UTC
+from datetime import UTC, date, datetime, timedelta
 
 import psycopg
 
@@ -229,7 +229,11 @@ def generate_orders_and_items(n_orders: int, customers: list[dict], products: li
         if rng.random() < DQ_FUTURE_ORDER_DATE:
             order_date = NOW + timedelta(days=rng.randint(1, 30))  # deliberate bad data
 
-        status = rng.choice(INVALID_STATUSES) if rng.random() < DQ_INVALID_STATUS else rng.choice(STATUSES)
+        status = (
+            rng.choice(INVALID_STATUSES)
+            if rng.random() < DQ_INVALID_STATUS
+            else rng.choice(STATUSES)
+        )
 
         orders.append({
             "id": order_id,
@@ -301,7 +305,9 @@ def generate_all() -> GeneratedData:
     data = GeneratedData()
     data.customers = generate_customers(N_CUSTOMERS)
     data.products = generate_products(N_PRODUCTS)
-    data.orders, data.order_items = generate_orders_and_items(N_ORDERS, data.customers, data.products)
+    data.orders, data.order_items = generate_orders_and_items(
+        N_ORDERS, data.customers, data.products
+    )
     data.shipments = generate_shipments(data.orders)
     return data
 

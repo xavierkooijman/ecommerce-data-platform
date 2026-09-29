@@ -1,9 +1,17 @@
-from ecommerce_data_platform.storage.base import LandingStore, CheckpointStore
-from ecommerce_data_platform.extract.base import IncrementalExtractor
 import psycopg
 
+from ecommerce_data_platform.extract.base import IncrementalExtractor
+from ecommerce_data_platform.storage.base import CheckpointStore, LandingStore
+
+
 class EcommerceIncrementalIngestion:
-    def __init__(self, extractor: IncrementalExtractor, landing_store: LandingStore, checkpoint_store: CheckpointStore, warehouse_conn: psycopg.Connection):
+    def __init__(
+        self,
+        extractor: IncrementalExtractor,
+        landing_store: LandingStore,
+        checkpoint_store: CheckpointStore,
+        warehouse_conn: psycopg.Connection,
+    ):
         self._extractor = extractor
         self._landing_store = landing_store
         self._checkpoint_store = checkpoint_store

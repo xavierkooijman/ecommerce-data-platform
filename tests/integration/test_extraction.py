@@ -1,5 +1,6 @@
 from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
 
+
 def test_extract_without_watermark_returns_all_rows(postgres_source_conn):
     extractor = PostgresIncrementalExtractor(postgres_source_conn)
     customers = extractor.extract("customers", None)

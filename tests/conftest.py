@@ -1,7 +1,8 @@
-import pytest
-import psycopg
-from testcontainers.community.postgres import PostgresContainer
 from pathlib import Path
+
+import psycopg
+import pytest
+from testcontainers.community.postgres import PostgresContainer
 
 PROJECT_ROOT = Path(__file__).parents[1]
 SCHEMA_FILE = PROJECT_ROOT / "sql" / "schema.sql"
