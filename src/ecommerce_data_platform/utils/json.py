@@ -1,5 +1,6 @@
 from datetime import date, datetime
 
+
 def json_default(value: object) -> str:
     if isinstance(value, (date, datetime)):
         return value.isoformat()

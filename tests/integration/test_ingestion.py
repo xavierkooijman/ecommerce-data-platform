@@ -1,10 +1,15 @@
-from ecommerce_data_platform.pipeline.ingestion import EcommerceIncrementalIngestion
-from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
-from ecommerce_data_platform.storage.postgres import PostgresLandingStore, PostgresCheckpointStore
 from unittest.mock import patch
+
 import pytest
 
-def test_ingestion_loads_records_and_updates_checkpoint(postgres_source_conn, postgres_warehouse_conn):
+from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
+from ecommerce_data_platform.pipeline.ingestion import EcommerceIncrementalIngestion
+from ecommerce_data_platform.storage.postgres import PostgresCheckpointStore, PostgresLandingStore
+
+
+def test_ingestion_loads_records_and_updates_checkpoint(
+    postgres_source_conn, postgres_warehouse_conn
+):
     extractor = PostgresIncrementalExtractor(
         postgres_source_conn
     )
