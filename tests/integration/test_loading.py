@@ -1,0 +1,36 @@
+from ecommerce_data_platform.storage.postgres import PostgresLandingStore
+from datetime import date
+
+def test_persist_customers(postgres_warehouse_conn):
+    records = [
+        {"id": 1, "email": "alice@example.com", "signup_date": date(2025, 1, 10)},
+        {"id": 2, "email": "bob@example.com", "signup_date": date(2025, 2, 9)},
+    ]
+
+    store = PostgresLandingStore(postgres_warehouse_conn)
+
+    inserted = store.persist("customers", records)
+
+    assert inserted == 2
+
+    with postgres_warehouse_conn.cursor() as cur:
+        cur.execute("""
+            SELECT payload
+            FROM bronze.customers
+            ORDER BY ingestion_id
+        """)
+
+        payloads = [row[0] for row in cur.fetchall()]
+
+    for record in records:
+        record["signup_date"] = record["signup_date"].isoformat()
+    assert payloads == records
+
+def test_persist_empty_records(postgres_warehouse_conn):
+    store = PostgresLandingStore(postgres_warehouse_conn)
+
+    assert store.persist("customers", []) == 0
+
+    with postgres_warehouse_conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM bronze.customers")
+        assert cur.fetchone()[0] == 0
