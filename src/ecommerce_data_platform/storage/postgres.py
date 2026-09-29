@@ -1,8 +1,10 @@
 import psycopg
+import json
 from psycopg import sql
 from psycopg.types.json import Jsonb
 from typing import Any
 from datetime import datetime
+from ecommerce_data_platform.utils.json import json_default
 
 class PostgresLandingStore:
     def __init__(self, conn: psycopg.Connection) -> None:
@@ -17,7 +19,7 @@ class PostgresLandingStore:
         with self._conn.cursor() as cur:
             with cur.copy(query) as copy:
                 for record in records:
-                    copy.write_row((Jsonb(record),))
+                    copy.write_row((Jsonb(record, dumps=lambda obj: json.dumps(obj, default=json_default)),))
 
         return len(records)
 
