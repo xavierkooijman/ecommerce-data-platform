@@ -37,7 +37,7 @@ INSERT INTO products (
     3,
     'CHAIR-001',
     'Office Chair',
-    'Furniture',
+    'Home',
     249.50,
     '2025-06-03 10:00:00+00',
     '2025-06-06 14:00:00+00'
@@ -55,10 +55,10 @@ INSERT INTO products (
 INSERT INTO orders (
     id, customer_id, status, payment_method, order_date
 ) VALUES
-    (1, 1, 'completed', 'credit_card', '2025-06-01 10:30:00+00'),
+    (1, 1, 'delivered', 'credit_card', '2025-06-01 10:30:00+00'),
     (2, 1, 'shipped', 'paypal', '2025-06-02 14:15:00+00'),
-    (3, 2, 'pending', 'credit_card', '2025-06-03 09:00:00+00'),
-    (4, 4, 'cancelled', 'debit_card', '2025-06-04 16:45:00+00');
+    (3, 2, 'processing', 'credit_card', '2025-06-03 09:00:00+00'),
+    (4, 4, 'cancelled', 'credit_card', '2025-06-04 16:45:00+00');
 
 INSERT INTO order_items (
     id, order_id, product_id, quantity, unit_price
@@ -74,8 +74,7 @@ INSERT INTO shipments (
     id, order_id, carrier, shipped_at, delivered_at
 ) VALUES
     (1, 1, 'DHL', '2025-06-02 08:00:00+00', '2025-06-04 12:00:00+00'),
-    (2, 2, 'CTT', '2025-06-03 10:00:00+00', NULL),
-    (3, 4, 'UPS', NULL, NULL);
+    (2, 2, 'CTT Express', '2025-06-03 10:00:00+00', NULL);
 
 SELECT setval('customers_id_seq', (SELECT MAX(id) FROM customers));
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
