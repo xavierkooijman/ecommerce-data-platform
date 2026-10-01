@@ -7,20 +7,14 @@ from ecommerce_data_platform.pipeline.ingestion import EcommerceIncrementalInges
 from ecommerce_data_platform.storage.postgres import PostgresCheckpointStore, PostgresLandingStore
 
 
-def test_ingestion_loads_records_and_updates_checkpoint(
-    postgres_source_conn, postgres_warehouse_conn
+@pytest.fixture
+def ingestion_components(
+    postgres_source_conn,
+    postgres_warehouse_conn,
 ):
-    extractor = PostgresIncrementalExtractor(
-        postgres_source_conn
-    )
-
-    landing_store = PostgresLandingStore(
-        postgres_warehouse_conn
-    )
-
-    checkpoint_store = PostgresCheckpointStore(
-        postgres_warehouse_conn
-    )
+    extractor = PostgresIncrementalExtractor(postgres_source_conn)
+    landing_store = PostgresLandingStore(postgres_warehouse_conn)
+    checkpoint_store = PostgresCheckpointStore(postgres_warehouse_conn)
 
     ingestion = EcommerceIncrementalIngestion(
         extractor,
@@ -28,6 +22,15 @@ def test_ingestion_loads_records_and_updates_checkpoint(
         checkpoint_store,
         postgres_warehouse_conn,
     )
+
+    return ingestion, checkpoint_store
+
+
+def test_ingestion_loads_records_and_updates_checkpoint(
+    ingestion_components, postgres_warehouse_conn
+):
+
+    ingestion, checkpoint_store = ingestion_components
 
     ingestion.run("customers")
     with postgres_warehouse_conn.cursor() as cur:
@@ -40,27 +43,12 @@ def test_ingestion_loads_records_and_updates_checkpoint(
     assert watermark is not None
 
 def test_ingestion_rolls_back_when_checkpoint_update_fails(
-    postgres_source_conn,
+    ingestion_components,
     postgres_warehouse_conn,
 ):
-    extractor = PostgresIncrementalExtractor(
-        postgres_source_conn
-    )
 
-    landing_store = PostgresLandingStore(
-        postgres_warehouse_conn
-    )
+    ingestion, checkpoint_store = ingestion_components
 
-    checkpoint_store = PostgresCheckpointStore(
-        postgres_warehouse_conn
-    )
-
-    ingestion = EcommerceIncrementalIngestion(
-        extractor,
-        landing_store,
-        checkpoint_store,
-        postgres_warehouse_conn,
-    )
 
     previous_watermark = checkpoint_store.get("customers")
 
@@ -80,4 +68,34 @@ def test_ingestion_rolls_back_when_checkpoint_update_fails(
         assert cur.fetchone()[0] == 0
 
     assert checkpoint_store.get("customers") == previous_watermark
+
+
+@pytest.mark.parametrize(
+    ("table", "expected_rows"),
+    [
+        ("customers", 4),
+        ("products", 4),
+        ("orders", 4),
+        ("order_items", 6),
+        ("shipments", 2),
+    ],
+)
+def test_ingestion_lands_every_table(
+    table,
+    expected_rows,
+    ingestion_components,
+    postgres_warehouse_conn
+):
+
+    ingestion, checkpoint_store = ingestion_components
+    
+    ingestion.run(table)
+
+    with postgres_warehouse_conn.cursor() as cur:
+        cur.execute(
+            f"SELECT COUNT(*) FROM bronze.{table}"
+        )
+        assert cur.fetchone()[0] == expected_rows
+
+    assert checkpoint_store.get(table) is not None
     
