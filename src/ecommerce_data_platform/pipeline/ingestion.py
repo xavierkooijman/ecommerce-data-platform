@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import psycopg
 
 from ecommerce_data_platform.extract.base import IncrementalExtractor
@@ -18,7 +20,14 @@ class EcommerceIncrementalIngestion:
         self._warehouse_conn = warehouse_conn
 
     def run(self, table: str) -> None:
-        watermark = self._checkpoint_store.get(table)
+        checkpoint = self._checkpoint_store.get("ingest", table)
+
+        if checkpoint is not None and not isinstance(checkpoint, datetime):
+            raise TypeError(
+                "Incremental ingestion checkpoint must be a datetime"
+            )
+
+        watermark = checkpoint
 
         records = self._extractor.extract(
             table,
@@ -30,8 +39,8 @@ class EcommerceIncrementalIngestion:
 
         try:
             self._landing_store.persist(table, records)
-            new_watermark = max(record["updated_at"] for record in records)
-            self._checkpoint_store.set(table, new_watermark)
+            new_checkpoint = max(record["updated_at"] for record in records)
+            self._checkpoint_store.set("ingest", table, new_checkpoint)
             self._warehouse_conn.commit()
         except Exception:
             self._warehouse_conn.rollback()

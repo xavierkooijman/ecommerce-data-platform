@@ -1,11 +1,12 @@
 import json
-from datetime import datetime
 from typing import Any
 
 import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
+from ecommerce_data_platform.types import Checkpoint
+from ecommerce_data_platform.utils.checkpoints import checkpoint_to_columns, columns_to_checkpoint
 from ecommerce_data_platform.utils.json import json_default
 
 
@@ -38,24 +39,60 @@ class PostgresCheckpointStore:
     def __init__(self, conn: psycopg.Connection) -> None:
         self._conn = conn
 
-    def get(self, pipeline_name: str) -> datetime | None:
+    def get(self,
+            stage: str,
+            source_table: str
+            ) -> Checkpoint | None:
         with self._conn.cursor() as cur:
             cur.execute(
-                "SELECT watermark FROM meta.pipeline_checkpoints WHERE pipeline_name = %s",
-                (pipeline_name,),
+                """
+                SELECT checkpoint_ts, checkpoint_num 
+                FROM meta.checkpoints 
+                WHERE stage = %s AND source_table = %s
+                """,
+                (stage, source_table),
             )
 
             row = cur.fetchone()
-            return row[0] if row else None
 
-    def set(self, pipeline_name: str, watermark: datetime) -> None:
+        if row is None:
+            return None
+
+        checkpoint_ts, checkpoint_num = row
+
+        return columns_to_checkpoint(checkpoint_ts, checkpoint_num)
+
+    def set(
+        self,
+        stage: str,
+        source_table: str,
+        checkpoint: Checkpoint,
+    ) -> None:
+        
+        checkpoint_ts, checkpoint_num = checkpoint_to_columns(checkpoint)
+
         with self._conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO meta.pipeline_checkpoints (pipeline_name, watermark) "
-                "VALUES (%s, %s) "
-                "ON CONFLICT(pipeline_name) DO UPDATE SET "
-                "watermark = EXCLUDED.watermark, updated_at = NOW()",
-                (pipeline_name, watermark),
+                """
+                INSERT INTO meta.checkpoints (
+                    stage,
+                    source_table,
+                    checkpoint_ts,
+                    checkpoint_num
+                )
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (stage, source_table)
+                DO UPDATE SET
+                    checkpoint_ts = EXCLUDED.checkpoint_ts,
+                    checkpoint_num = EXCLUDED.checkpoint_num,
+                    updated_at = NOW()
+                """,
+                (
+                    stage,
+                    source_table,
+                    checkpoint_ts,
+                    checkpoint_num,
+                ),
             )
 
         
