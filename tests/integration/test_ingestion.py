@@ -38,7 +38,7 @@ def test_ingestion_loads_records_and_updates_checkpoint(
 
         assert cur.fetchone()[0] == 4
 
-    watermark = checkpoint_store.get("customers")
+    watermark = checkpoint_store.get("ingest", "customers")
 
     assert watermark is not None
 
@@ -49,8 +49,7 @@ def test_ingestion_rolls_back_when_checkpoint_update_fails(
 
     ingestion, checkpoint_store = ingestion_components
 
-
-    previous_watermark = checkpoint_store.get("customers")
+    previous_watermark = checkpoint_store.get("ingest", "customers")
 
     with patch.object(
         checkpoint_store,
@@ -67,7 +66,7 @@ def test_ingestion_rolls_back_when_checkpoint_update_fails(
 
         assert cur.fetchone()[0] == 0
 
-    assert checkpoint_store.get("customers") == previous_watermark
+    assert checkpoint_store.get("ingest", "customers") == previous_watermark
 
 
 @pytest.mark.parametrize(
@@ -97,5 +96,5 @@ def test_ingestion_lands_every_table(
         )
         assert cur.fetchone()[0] == expected_rows
 
-    assert checkpoint_store.get(table) is not None
+    assert checkpoint_store.get("ingest", table) is not None
     
