@@ -31,8 +31,12 @@ CREATE TABLE IF NOT EXISTS bronze.shipments (
     payload JSONB NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS meta.pipeline_checkpoints (
-    pipeline_name TEXT PRIMARY KEY,
-    watermark TIMESTAMPTZ NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS meta.checkpoints (
+    stage TEXT NOT NULL,
+    source_table TEXT NOT NULL,
+    checkpoint_ts TIMESTAMPTZ,
+    checkpoint_num BIGINT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (stage, source_table),
+    CHECK( num_nonnulls(checkpoint_ts, checkpoint_num) = 1 )
 );
