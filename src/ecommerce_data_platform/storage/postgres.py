@@ -6,6 +6,7 @@ import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
+from ecommerce_data_platform.storage.base import BronzeRecord
 from ecommerce_data_platform.utils.json import json_default
 
 
@@ -33,6 +34,23 @@ class PostgresLandingStore:
 
         return len(records)
 
+class PostgresBronzeReader:
+    def __init__(self, conn: psycopg.Connection) -> None:
+        self._conn = conn
+
+    def read(self, table: str, last_ingestion_id: int | None) -> list[BronzeRecord]:
+        query = sql.SQL(
+            "SELECT ingestion_id, payload FROM {} WHERE ingestion_id > %s"
+        ).format(sql.Identifier("bronze", table))
+
+        with self._conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
+            cur.execute(query, (last_ingestion_id or 0,))
+            return [
+                BronzeRecord(
+                    ingestion_id=row["ingestion_id"], payload=row["payload"]
+                )
+                for row in cur.fetchall()
+            ]
 
 class PostgresCheckpointStore:
     def __init__(self, conn: psycopg.Connection) -> None:
