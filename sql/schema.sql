@@ -40,3 +40,20 @@ CREATE TABLE IF NOT EXISTS meta.checkpoints (
     PRIMARY KEY (stage, source_table),
     CHECK( num_nonnulls(checkpoint_ts, checkpoint_num) = 1 )
 );
+
+CREATE TABLE IF NOT EXISTS meta.quarantine (
+    quarantine_id BIGSERIAL PRIMARY KEY,
+    source_table TEXT NOT NULL,
+    ingestion_id BIGINT NOT NULL,
+    source_pk TEXT,
+    errors JSONB NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open'
+        CHECK (status IN ('open', 'revalidated', 'superseded', 'wont_fix')),
+    quarantined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ,
+    UNIQUE (source_table, ingestion_id),
+    CHECK (
+        (status = 'open' AND resolved_at IS NULL)
+        OR (status != 'open' AND resolved_at IS NOT NULL)
+    )
+);

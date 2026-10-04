@@ -8,7 +8,7 @@ def test_get_returns_none_when_checkpoint_does_not_exist(
 ):
     store = PostgresCheckpointStore(postgres_warehouse_conn)
 
-    assert store.get("ingest", "orders") is None
+    assert store.get("ingestion", "orders") is None
 
 
 def test_set_and_get_timestamp_checkpoint(
@@ -17,10 +17,10 @@ def test_set_and_get_timestamp_checkpoint(
     store = PostgresCheckpointStore(postgres_warehouse_conn)
     checkpoint = datetime(2026, 1, 1, tzinfo=UTC)
 
-    store.set("ingest", "orders", checkpoint)
+    store.set("ingestion", "orders", checkpoint)
     postgres_warehouse_conn.commit()
 
-    assert store.get("ingest", "orders") == checkpoint
+    assert store.get("ingestion", "orders") == checkpoint
 
 
 def test_set_and_get_integer_checkpoint(
@@ -28,10 +28,10 @@ def test_set_and_get_integer_checkpoint(
 ):
     store = PostgresCheckpointStore(postgres_warehouse_conn)
 
-    store.set("validate", "orders", 123)
+    store.set("validation", "orders", 123)
     postgres_warehouse_conn.commit()
 
-    assert store.get("validate", "orders") == 123
+    assert store.get("validation", "orders") == 123
 
 
 def test_set_updates_existing_checkpoint(
@@ -39,11 +39,11 @@ def test_set_updates_existing_checkpoint(
 ):
     store = PostgresCheckpointStore(postgres_warehouse_conn)
 
-    store.set("validate", "orders", 100)
-    store.set("validate", "orders", 200)
+    store.set("validation", "orders", 100)
+    store.set("validation", "orders", 200)
     postgres_warehouse_conn.commit()
 
-    assert store.get("validate", "orders") == 200
+    assert store.get("validation", "orders") == 200
 
 
 def test_checkpoints_are_isolated_by_stage_and_source_table(
@@ -53,13 +53,13 @@ def test_checkpoints_are_isolated_by_stage_and_source_table(
 
     timestamp = datetime(2026, 1, 1, tzinfo=UTC)
 
-    store.set("ingest", "orders", timestamp)
-    store.set("ingest", "customers", timestamp)
-    store.set("validate", "orders", 100)
-    store.set("validate", "customers", 200)
+    store.set("ingestion", "orders", timestamp)
+    store.set("ingestion", "customers", timestamp)
+    store.set("validation", "orders", 100)
+    store.set("validation", "customers", 200)
     postgres_warehouse_conn.commit()
 
-    assert store.get("ingest", "orders") == timestamp
-    assert store.get("ingest", "customers") == timestamp
-    assert store.get("validate", "orders") == 100
-    assert store.get("validate", "customers") == 200
+    assert store.get("ingestion", "orders") == timestamp
+    assert store.get("ingestion", "customers") == timestamp
+    assert store.get("validation", "orders") == 100
+    assert store.get("validation", "customers") == 200

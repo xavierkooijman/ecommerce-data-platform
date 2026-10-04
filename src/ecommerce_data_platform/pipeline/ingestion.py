@@ -4,6 +4,7 @@ import psycopg
 
 from ecommerce_data_platform.extract.base import IncrementalExtractor
 from ecommerce_data_platform.storage.base import CheckpointStore, LandingStore
+from ecommerce_data_platform.types import PipelineStage
 
 
 class EcommerceIncrementalIngestion:
@@ -20,7 +21,7 @@ class EcommerceIncrementalIngestion:
         self._warehouse_conn = warehouse_conn
 
     def run(self, table: str) -> None:
-        checkpoint = self._checkpoint_store.get("ingest", table)
+        checkpoint = self._checkpoint_store.get(PipelineStage.INGESTION, table)
 
         if checkpoint is not None and not isinstance(checkpoint, datetime):
             raise TypeError(
@@ -40,7 +41,7 @@ class EcommerceIncrementalIngestion:
         try:
             self._landing_store.persist(table, records)
             new_checkpoint = max(record["updated_at"] for record in records)
-            self._checkpoint_store.set("ingest", table, new_checkpoint)
+            self._checkpoint_store.set(PipelineStage.INGESTION, table, new_checkpoint)
             self._warehouse_conn.commit()
         except Exception:
             self._warehouse_conn.rollback()

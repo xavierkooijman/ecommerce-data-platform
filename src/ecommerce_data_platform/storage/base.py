@@ -1,12 +1,23 @@
 from typing import Any, Protocol
 
-from ecommerce_data_platform.types import Checkpoint
+from ecommerce_data_platform.records import BronzeRecord, RejectedRecord
+from ecommerce_data_platform.types import Checkpoint, PipelineStage, QuarantineStatus
 
 
 class LandingStore(Protocol):
     def persist(self, table: str, records: list[dict[str, Any]]) -> int: ...
 
-class CheckpointStore(Protocol):
-    def get(self, stage: str, source_table: str) -> Checkpoint | None: ...
+class BronzeReader(Protocol):
+    def read(self, table: str, last_ingestion_id: int | None) -> list[BronzeRecord]: ...
 
-    def set(self, stage: str, source_table: str, checkpoint: Checkpoint) -> None: ...
+class CheckpointStore(Protocol):
+    def get(self, stage: PipelineStage, source_table: str) -> Checkpoint | None: ...
+
+    def set(self, stage: PipelineStage, source_table: str, checkpoint: Checkpoint) -> None: ...
+
+class QuarantineStore(Protocol):
+    def persist(
+        self, table: str, records: list[RejectedRecord]
+    ) -> None: ...
+
+    def resolve(self, quarantine_id: int, status: QuarantineStatus) -> None: ...
