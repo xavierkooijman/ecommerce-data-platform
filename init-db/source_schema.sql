@@ -1,6 +1,6 @@
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
-    email TEXT UNIQUE,
+    email TEXT UNIQUE NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     country TEXT NOT NULL,

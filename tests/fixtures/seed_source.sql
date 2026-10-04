@@ -3,7 +3,7 @@ INSERT INTO customers (
 ) VALUES
     (1, 'alice@example.com', 'Alice', 'Silva', 'Portugal', 'Porto', TRUE, '2025-01-10'),
     (2, 'bob@example.com', 'Bob', 'Santos', 'Portugal', 'Lisbon', TRUE, '2025-02-15'),
-    (3, NULL, 'Charlie', 'Costa', 'Spain', NULL, TRUE, '2025-03-20'),
+    (3, 'charlie@example.com', 'Charlie', 'Costa', 'Spain', NULL, TRUE, '2025-03-20'),
     (4, 'diana@example.com', 'Diana', 'Martins', 'Portugal', 'Braga', FALSE, '2025-04-05');
 
 INSERT INTO products (
