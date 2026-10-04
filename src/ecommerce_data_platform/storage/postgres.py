@@ -82,7 +82,7 @@ class PostgresCheckpointStore:
 
     def set(
         self,
-        stage: str,
+        stage: PipelineStage,
         source_table: str,
         checkpoint: Checkpoint,
     ) -> None:

@@ -1,7 +1,7 @@
 from typing import Any, Protocol
 
 from ecommerce_data_platform.records import BronzeRecord, RejectedRecord
-from ecommerce_data_platform.types import Checkpoint, QuarantineStatus, PipelineStage
+from ecommerce_data_platform.types import Checkpoint, PipelineStage, QuarantineStatus
 
 
 class LandingStore(Protocol):
