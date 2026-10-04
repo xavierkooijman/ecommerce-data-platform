@@ -5,8 +5,8 @@ import psycopg
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ecommerce_data_platform.storage.base import BronzeRecord
-from ecommerce_data_platform.types import Checkpoint
+from ecommerce_data_platform.records import BronzeRecord, RejectedRecord
+from ecommerce_data_platform.types import Checkpoint, PipelineStage, QuarantineStatus
 from ecommerce_data_platform.utils.checkpoints import checkpoint_to_columns, columns_to_checkpoint
 from ecommerce_data_platform.utils.json import json_default
 
@@ -58,7 +58,7 @@ class PostgresCheckpointStore:
         self._conn = conn
 
     def get(self,
-            stage: str,
+            stage: PipelineStage,
             source_table: str
             ) -> Checkpoint | None:
         with self._conn.cursor() as cur:
@@ -113,6 +113,39 @@ class PostgresCheckpointStore:
                 ),
             )
 
+class PostgresQuarantineStore:
+    def __init__(self, conn: psycopg.Connection):
+        self._conn = conn
+
+    def persist(self, table: str, records: list[RejectedRecord]) -> None:
+
+        with self._conn.cursor() as cur:
+            query = """
+                INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (source_table, ingestion_id) DO NOTHING
+            """
+            values = [
+                (
+                    table,
+                    record.ingestion_id,
+                    record.source_pk,
+                    Jsonb(record.errors),
+                )
+                for record in records
+            ]
+
+            cur.executemany(query, values)
+
+    def resolve(self, quarantine_id: int, status: QuarantineStatus) -> None:
+
+        with self._conn.cursor() as cur:
+            query = """
+                UPDATE meta.quarantine
+                SET status = %s, resolved_at = NOW()
+                WHERE quarantine_id = %s
+            """
+            cur.execute(query, (status, quarantine_id))
         
         
         

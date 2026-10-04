@@ -20,7 +20,7 @@ class EcommerceIncrementalIngestion:
         self._warehouse_conn = warehouse_conn
 
     def run(self, table: str) -> None:
-        checkpoint = self._checkpoint_store.get("ingest", table)
+        checkpoint = self._checkpoint_store.get("ingestion", table)
 
         if checkpoint is not None and not isinstance(checkpoint, datetime):
             raise TypeError(
@@ -40,7 +40,7 @@ class EcommerceIncrementalIngestion:
         try:
             self._landing_store.persist(table, records)
             new_checkpoint = max(record["updated_at"] for record in records)
-            self._checkpoint_store.set("ingest", table, new_checkpoint)
+            self._checkpoint_store.set("ingestion", table, new_checkpoint)
             self._warehouse_conn.commit()
         except Exception:
             self._warehouse_conn.rollback()
