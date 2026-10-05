@@ -1,0 +1,104 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    description: "Raw landing tables containing source records stored as JSONB."
+
+    tables:
+      - name: customers
+        description: "Raw customer records ingested from the source database."
+        columns:
+          - name: ingestion_id
+            description: "Unique identifier assigned when the record is ingested into Bronze."
+            tests:
+              - not_null
+              - unique
+          
+          - name: ingested_at
+            description: "Timestamp when the record was written to Bronze."
+            tests:
+              - not_null
+
+          - name: payload
+            description: "Raw source record stored as JSONB."
+            tests:
+              - not_null
+      
+      - name: products
+        description: "Raw product records ingested from the source database."
+        columns:
+          - name: ingestion_id
+            description: "Unique identifier assigned when the record is ingested into Bronze."
+            tests:
+              - not_null
+              - unique
+          
+          - name: ingested_at
+            description: "Timestamp when the record was written to Bronze."
+            tests:
+              - not_null
+
+          - name: payload
+            description: "Raw source record stored as JSONB."
+            tests:
+              - not_null
+
+      - name: orders
+        description: "Raw order records ingested from the source database."
+        columns:
+          - name: ingestion_id
+            description: "Unique identifier assigned when the record is ingested into Bronze."
+            tests:
+              - not_null
+              - unique
+          
+          - name: ingested_at
+            description: "Timestamp when the record was written to Bronze."
+            tests:
+              - not_null
+
+          - name: payload
+            description: "Raw source record stored as JSONB."
+            tests:
+              - not_null
+
+      - name: order_items
+        description: "Raw order item records ingested from the source database."
+        columns:
+          - name: ingestion_id
+            description: "Unique identifier assigned when the record is ingested into Bronze."
+            tests:
+              - not_null
+              - unique
+          
+          - name: ingested_at
+            description: "Timestamp when the record was written to Bronze."
+            tests:
+              - not_null
+
+          - name: payload
+            description: "Raw source record stored as JSONB."
+            tests:
+              - not_null
+
+      - name: shipments
+        description: "Raw shipment records ingested from the source database."
+        columns:
+          - name: ingestion_id
+            description: "Unique identifier assigned when the record is ingested into Bronze."
+            tests:
+              - not_null
+              - unique
+          
+          - name: ingested_at
+            description: "Timestamp when the record was written to Bronze."
+            tests:
+              - not_null
+
+          - name: payload
+            description: "Raw source record stored as JSONB."
+            tests:
+              - not_null
+
+          

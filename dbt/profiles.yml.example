@@ -1,0 +1,12 @@
+ecommerce_data_platform:
+  outputs:
+    dev:
+      dbname: warehouse
+      host: localhost
+      pass: "{{ env_var('WAREHOUSE_DB_PASSWORD') }}"
+      port: 5433
+      schema: dbt
+      threads: 2
+      type: postgres
+      user: warehouse_user
+  target: dev
