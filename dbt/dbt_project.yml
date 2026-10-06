@@ -16,4 +16,4 @@ models:
   ecommerce_data_platform:
     silver:
       +schema: silver
-      +materialized: view
+      +materialized: incremental

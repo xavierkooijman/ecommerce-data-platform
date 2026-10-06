@@ -70,8 +70,7 @@ sources:
             description: "Unique identifier assigned when the record is ingested into Bronze."
             tests:
               - not_null
-              - unique
-          
+                        
           - name: ingested_at
             description: "Timestamp when the record was written to Bronze."
             tests:
@@ -101,4 +100,42 @@ sources:
             tests:
               - not_null
 
-          
+  - name: meta
+    schema: meta
+    description: "Metadata tables containing information about the ingestion process."
+    tables:
+      - name: quarantine
+        description: "References of records that failed validation"
+        columns:
+          - name: quarantine_id
+            description: "Unique identifier assigned when the record is quarantined."
+            tests:
+              - not_null
+              - unique
+          - name: source_table
+            description: "The source table from which the record originated."
+            tests:
+              - not_null
+          - name: ingestion_id
+            description: "The ingestion_id of the record that was quarantined."
+            tests:
+              - not_null
+              - unique
+          - name: source_pk
+            description: "The primary key of the record in the source table."
+            tests:
+              - not_null
+          - name: errors
+            description: "JSON of error messages describing why the record was quarantined."
+            tests:
+              - not_null
+          - name: status
+            description: "The status of the quarantined record"
+            tests:
+              - not_null
+          - name: quarantined_at
+            description: "Timestamp when the record was quarantined."
+            tests:
+              - not_null
+          - name: resolved_at
+            description: "Timestamp when the record was resolved."
