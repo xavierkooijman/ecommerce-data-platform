@@ -1,6 +1,6 @@
 {{ config(
-    materialized='incremental',
-    unique_key='id'
+    unique_key='id',
+    incremental_strategy='merge',
 ) }}
 
 with bronze as (
@@ -10,10 +10,9 @@ with bronze as (
     from {{ source('bronze', 'orders') }}
 
     {% if is_incremental() %}
-        where ingestion_id >(
-            select
-                coalesce(max(bronze_ingestion_id), 0)
-            from {{ this }}
+        where ingestion_id > (
+            select coalesce(max(t.bronze_ingestion_id), 0)
+            from {{ this }} as t
         )
     {% endif %}
 ),
@@ -24,7 +23,7 @@ validated as (
     left join {{ source('meta', 'quarantine') }} as q
         on
             q.source_table = 'orders'
-            and b.ingestion_id = q.ingestion_d
+            and b.ingestion_id = q.ingestion_id
     where q.quarantine_id is null
 ),
 
@@ -63,10 +62,11 @@ latest as (
         r.updated_at
     from ranked as r
     {% if is_incremental() %}
-    left join {{ this }} t
-        on t.id = r.id
-    where r.rn = 1 
-        and (t.id is null or r.updated_at > t.updated_at)
+        left join {{ this }} as t
+            on r.id = t.id
+        where
+            r.rn = 1
+            and (t.id is null or r.updated_at > t.updated_at)
     {% else %}
         where r.rn = 1
     {% endif %}

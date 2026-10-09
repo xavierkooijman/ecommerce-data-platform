@@ -31,5 +31,8 @@ jobs:
       - name: Type check
         run: uv run mypy src
 
+      - name: Lint dbt SQL
+        run: uv run sqlfluff lint dbt/
+
       - name: Test
         run: uv run pytest

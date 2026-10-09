@@ -1,0 +1,38 @@
+models:
+  - name: orders
+    description: "This table contains order information."
+    columns:
+      - name: bronze_ingestion_id
+        description: "The unique identifier from ingestion."
+        tests:
+          - not_null
+          - unique
+      - name: id
+        description: "The unique identifier for the order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "The unique identifier for the customer who placed the order."
+        tests:
+          - not_null
+      - name: status
+        description: "The status of the order."
+        tests:
+          - not_null
+      - name: payment_method
+        description: "The payment method used for the order."
+        tests:
+          - not_null
+      - name: order_date
+        description: "The date when the order was placed."
+        tests:
+          - not_null
+      - name: created_at
+        description: "The timestamp when the order was created."
+        tests:
+          - not_null
+      - name: updated_at
+        description: "The timestamp when the order was last updated."
+        tests:
+          - not_null

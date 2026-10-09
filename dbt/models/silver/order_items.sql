@@ -7,7 +7,7 @@ with bronze as (
     select
         ingestion_id,
         payload
-    from {{ source('bronze', 'products') }}
+    from {{ source('bronze', 'order_items') }}
 
     {% if is_incremental() %}
         where ingestion_id > (
@@ -22,7 +22,7 @@ validated as (
     from bronze as b
     left join {{ source('meta', 'quarantine') }} as q
         on
-            q.source_table = 'products'
+            q.source_table = 'order_items'
             and b.ingestion_id = q.ingestion_id
     where q.quarantine_id is null
 ),
@@ -31,13 +31,12 @@ typed as (
     select
         ingestion_id as bronze_ingestion_id,
         (payload ->> 'id')::int as id,
-        payload ->> 'sku' as sku,
-        payload ->> 'name' as product_name,
-        payload ->> 'category' as category,
-        (payload ->> 'price')::numeric(10, 2) as price,
+        (payload ->> 'order_id')::int as order_id,
+        (payload ->> 'product_id')::int as product_id,
+        (payload ->> 'quantity')::int as quantity,
+        (payload ->> 'unit_price')::numeric(10, 2) as unit_price,
         (payload ->> 'created_at')::timestamptz as created_at,
         (payload ->> 'updated_at')::timestamptz as updated_at
-
     from validated
 ),
 
@@ -52,14 +51,13 @@ ranked as (
 ),
 
 latest as (
-
     select
         r.bronze_ingestion_id,
         r.id,
-        r.sku,
-        r.product_name,
-        r.category,
-        r.price,
+        r.order_id,
+        r.product_id,
+        r.quantity,
+        r.unit_price,
         r.created_at,
         r.updated_at
     from ranked as r
@@ -72,7 +70,6 @@ latest as (
     {% else %}
         where r.rn = 1
     {% endif %}
-
 )
 
 select *
