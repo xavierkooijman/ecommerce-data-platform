@@ -66,7 +66,14 @@ latest as (
             on r.id = t.id
         where
             r.rn = 1
-            and (t.id is null or r.updated_at > t.updated_at)
+            and (
+                t.id is null
+                or r.updated_at > t.updated_at
+                or (
+                    r.updated_at = t.updated_at
+                    and r.bronze_ingestion_id > t.bronze_ingestion_id
+                )
+            )
     {% else %}
         where r.rn = 1
     {% endif %}
