@@ -16,6 +16,7 @@ models:
         description: "Customer's email address."
         tests:
           - not_null
+          - unique
       - name: first_name
         description: "Customer's first name."
         tests:
@@ -30,8 +31,6 @@ models:
           - not_null
       - name: city
         description: "Customer's city."
-        tests:
-          - not_null
       - name: signup_date
         description: "Date when the customer signed up."
         tests:
