@@ -1,0 +1,45 @@
+models:
+  - name: customers
+    description: "Customer records in the Silver layer."
+    columns:
+      - name: bronze_ingestion_id
+        description: "The unique identifier from ingestion."
+        tests:
+          - not_null
+          - unique
+      - name: id
+        description: "Unique identifier for each customer."
+        tests:
+          - not_null
+          - unique
+      - name: email
+        description: "Customer's email address."
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        description: "Customer's first name."
+        tests:
+          - not_null
+      - name: last_name
+        description: "Customer's last name."
+        tests:
+          - not_null
+      - name: country
+        description: "Customer's country."
+        tests:
+          - not_null
+      - name: city
+        description: "Customer's city."
+      - name: signup_date
+        description: "Date when the customer signed up."
+        tests:
+          - not_null
+      - name: created_at
+        description: "Timestamp when the customer record was created."
+        tests:
+          - not_null
+      - name: updated_at
+        description: "Timestamp when the customer record was last updated."
+        tests:
+          - not_null

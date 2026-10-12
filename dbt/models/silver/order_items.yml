@@ -1,0 +1,38 @@
+models:
+  - name: order_items
+    description: "This table contains order item information."
+    columns:
+      - name: bronze_ingestion_id
+        description: "The unique identifier from ingestion."
+        tests:
+          - not_null
+          - unique
+      - name: id
+        description: "The unique identifier for the order item."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "The unique identifier of the order associated with this item."
+        tests:
+          - not_null
+      - name: product_id
+        description: "The unique identifier of the product associated with this item."
+        tests:
+          - not_null
+      - name: quantity
+        description: "The quantity of the product ordered."
+        tests:
+          - not_null
+      - name: unit_price
+        description: "The price per unit of the product at the time of order."
+        tests:
+          - not_null
+      - name: created_at
+        description: "The timestamp when the order item was created."
+        tests:
+          - not_null
+      - name: updated_at
+        description: "The timestamp when the order item was last updated."
+        tests:
+          - not_null

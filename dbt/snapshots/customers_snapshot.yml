@@ -1,0 +1,10 @@
+snapshots:
+  - name: customers_snapshot
+    relation: ref('customers')
+    description: Historical versions of customer records in the Silver layer.
+    config:
+      schema: silver
+      strategy: timestamp
+      unique_key: id
+      updated_at: updated_at
+      hard_deletes: ignore

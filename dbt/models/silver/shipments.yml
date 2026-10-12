@@ -1,0 +1,34 @@
+models:
+  - name: shipments
+    description: "This table contains shipment information."
+    columns:
+      - name: bronze_ingestion_id
+        description: "The unique identifier from ingestion."
+        tests:
+          - not_null
+          - unique
+      - name: id
+        description: "The unique identifier for the shipment."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "The unique identifier for the order associated with the shipment."
+        tests:
+          - not_null
+      - name: carrier
+        description: "The carrier responsible for the shipment."
+        tests:
+          - not_null
+      - name: shipped_at
+        description: "The date when the shipment was sent."
+      - name: delivered_at
+        description: "The date when the shipment was delivered."
+      - name: created_at
+        description: "The timestamp when the shipment was created."
+        tests:
+          - not_null
+      - name: updated_at
+        description: "The timestamp when the shipment was last updated."
+        tests:
+          - not_null
