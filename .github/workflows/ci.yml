@@ -24,9 +24,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
-    env:
-      DBT_TARGET: ci
 
     steps:
       - name: Checkout
@@ -51,6 +48,8 @@ jobs:
 
       - name: Lint dbt SQL
         run: uv run sqlfluff lint dbt/
+        env:
+          DBT_TARGET: ci
 
       - name: Test
         run: uv run pytest
