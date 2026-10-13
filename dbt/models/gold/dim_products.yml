@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: dim_products
+    description: "Product dimension"
+    columns:
+      - name: product_sk
+        description: "Deterministic surrogate key generated from the source product ID."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: id
+        description: "Source system product identifier."
+        data_tests:
+          - unique
+          - not_null

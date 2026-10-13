@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Date dimension providing calendar attributes for analytical reporting."
+    columns:
+      - name: date_sk
+        description: "Integer date key in YYYYMMDD format."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: full_date
+        description: "Calendar date, one row per date."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: day_of_month
+        description: "Day of the month"
+        data_tests:
+          - not_null
+
+      - name: day_of_week
+        description: "Day of the week"
+        data_tests:
+          - not_null
+
+      - name: month_number
+        description: "Month number"
+        data_tests:
+          - not_null
+
+      - name: quarter
+        description: "Quarter of the year"
+        data_tests:
+          - not_null
+
+      - name: calendar_year
+        description: "Calendar year."
+        data_tests:
+          - not_null
+
+      - name: is_weekend
+        description: "Whether the date falls on Saturday or Sunday."
+        data_tests:
+          - not_null
