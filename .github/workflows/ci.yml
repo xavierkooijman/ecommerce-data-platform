@@ -46,6 +46,9 @@ jobs:
       - name: Type check
         run: uv run mypy src
 
+      - name: Install dbt packages
+        run: uv run dbt deps --project-dir dbt/
+
       - name: Lint dbt SQL
         run: uv run sqlfluff lint dbt/
         env:
