@@ -1,0 +1,69 @@
+models:
+  - name: fct_orders
+    description: Fact table for orders
+    columns:
+      - name: order_sk
+        description: Surrogate key for the order
+        tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_sk
+        description: Surrogate key for the customer
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_sk
+
+      - name: status
+        description: Status of the order
+      
+      - name: payment_method
+        description: Payment method used for the order
+      
+      - name: order_date
+        description: Date when the order was placed
+
+      - name: order_date_sk
+        description: Surrogate key for the order date
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_sk
+
+      - name: carrier
+        description: Carrier used for shipping the order
+      
+      - name: shipped_at
+        description: Timestamp of when the order was shipped
+
+      - name: shipped_at_sk
+        description: Surrogate key for the shipped date
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_sk
+
+      - name: delivered_at
+        description: Timestamp of when the order was delivered
+
+      - name: delivered_at_sk
+        description: Surrogate key for the delivered date
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_sk
+      
+      - name: updated_at
+        description: Timestamp of when the order record was last updated

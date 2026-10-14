@@ -7,12 +7,12 @@ with dates as (
 )
 
 select
-    to_char(date_day, 'YYYYMMDD')::integer as date_sk,
     date_day::date as full_date,
+    to_char(date_day, 'YYYYMMDD')::integer as date_sk,
     extract(day from date_day)::integer as day_of_month,
     extract(isodow from date_day)::integer as day_of_week,
     extract(month from date_day)::integer as month_number,
-    extract(quarter from date_day)::integer as quarter,
-    extract(year from date_day)::integer as year,
+    extract(quarter from date_day)::integer as calendar_quarter,
+    extract(year from date_day)::integer as calendar_year,
     extract(isodow from date_day) in (6, 7) as is_weekend
 from dates

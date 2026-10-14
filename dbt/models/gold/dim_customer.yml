@@ -1,0 +1,48 @@
+models:
+  - name: dim_customer
+    description: "Customer dimension"
+    columns:
+      - name: customer_sk
+        description: "Deterministic surrogate key generated from the source customer ID."
+        tests:
+          - not_null
+          - unique
+          
+      - name: customer_id
+        description: "Source system customer identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: email
+        description: "Customer's email address."
+
+      - name: first_name
+        description: "Customer's first name."
+
+      - name: last_name
+        description: "Customer's last name."
+
+      - name: country
+        description: "Customer's country."
+
+      - name: city
+        description: "Customer's city."
+
+      - name: signup_date
+        description: "Date when the customer signed up."
+
+      - name: is_current
+        description: "Indicates if the customer record is current."
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Start date of the validity period for the customer record."
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "End date of the validity period for the customer record."
+        tests:
+          - not_null

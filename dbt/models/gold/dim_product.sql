@@ -5,18 +5,18 @@ with products as (
         sku,
         product_name,
         category,
-        price,
+        price
     from {{ ref('products') }}
 ),
 
 unknown_product as (
-    select 
+    select
         '-1'::text as product_sk,
         -1::int as product_id,
         'unknown'::text as sku,
         'unknown'::text as product_name,
         'unknown'::text as category,
-        0::numeric(10, 2) as price,
+        0::numeric(10, 2) as price
 )
 
 select *

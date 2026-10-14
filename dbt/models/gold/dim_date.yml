@@ -29,7 +29,7 @@ models:
         tests:
           - not_null
 
-      - name: quarter
+      - name: calendar_quarter
         description: "Quarter of the year"
         tests:
           - not_null
