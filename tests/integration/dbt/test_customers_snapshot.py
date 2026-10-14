@@ -45,7 +45,7 @@ def test_customer_snapshot_history(
         """
         SELECT last_name, dbt_valid_from, dbt_valid_to
         FROM silver.customers_snapshot
-        WHERE id = 301
+        WHERE customer_id = 301
         """
     ).fetchone()
 
@@ -73,7 +73,7 @@ def test_customer_snapshot_history(
         """
         SELECT last_name, dbt_valid_from, dbt_valid_to
         FROM silver.customers_snapshot
-        WHERE id = 301
+        WHERE customer_id = 301
         ORDER BY dbt_valid_from
         """
     ).fetchall()

@@ -7,7 +7,7 @@ models:
         tests:
           - not_null
           - unique
-      - name: id
+      - name: customer_id
         description: "Unique identifier for each customer."
         tests:
           - not_null

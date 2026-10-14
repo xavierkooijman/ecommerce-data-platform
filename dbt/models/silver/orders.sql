@@ -1,5 +1,5 @@
 {{ config(
-    unique_key='id',
+    unique_key='order_id',
     incremental_strategy='merge',
 ) }}
 
@@ -30,7 +30,7 @@ validated as (
 typed as (
     select
         ingestion_id as bronze_ingestion_id,
-        (payload ->> 'id')::int as id,
+        (payload ->> 'id')::int as order_id,
         (payload ->> 'customer_id')::int as customer_id,
         payload ->> 'status' as status,
         payload ->> 'payment_method' as payment_method,
@@ -44,7 +44,7 @@ ranked as (
     select
         *,
         row_number() over (
-            partition by id
+            partition by order_id
             order by updated_at desc, bronze_ingestion_id desc
         ) as rn
     from typed
@@ -53,7 +53,7 @@ ranked as (
 latest as (
     select
         r.bronze_ingestion_id,
-        r.id,
+        r.order_id,
         r.customer_id,
         r.status,
         r.payment_method,
@@ -63,11 +63,11 @@ latest as (
     from ranked as r
     {% if is_incremental() %}
         left join {{ this }} as t
-            on r.id = t.id
+            on r.order_id = t.order_id
         where
             r.rn = 1
             and (
-                t.id is null
+                t.order_id is null
                 or r.updated_at > t.updated_at
                 or (
                     r.updated_at = t.updated_at

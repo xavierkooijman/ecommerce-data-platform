@@ -20,7 +20,7 @@ validated as (
 typed as (
     select
         ingestion_id as bronze_ingestion_id,
-        (payload ->> 'id')::int as id,
+        (payload ->> 'id')::int as customer_id,
         payload ->> 'email' as email,
         payload ->> 'first_name' as first_name,
         payload ->> 'last_name' as last_name,
@@ -37,7 +37,7 @@ ranked as (
     select
         *,
         row_number() over (
-            partition by id
+            partition by customer_id
             order by updated_at desc, bronze_ingestion_id desc
         ) as rn
     from typed
@@ -45,7 +45,7 @@ ranked as (
 
 select
     bronze_ingestion_id,
-    id,
+    customer_id,
     email,
     first_name,
     last_name,
