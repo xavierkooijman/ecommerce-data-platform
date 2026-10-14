@@ -1,5 +1,7 @@
 select
-    {{ dbt_utils.generate_surrogate_key(['order_item_id']) }} as order_item_sk,
+    {{ 
+        dbt_utils.generate_surrogate_key(['oi.order_item_id']) 
+    }} as order_item_sk,
     oi.order_item_id,
     oi.order_id,
     coalesce(c.customer_sk, '-1') as customer_sk,
