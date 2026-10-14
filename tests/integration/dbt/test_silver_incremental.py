@@ -52,9 +52,9 @@ def test_silver_incremental_processing_and_update_precedence(
     # 205: new product is inserted.
     products = conn.execute(
         """
-        SELECT id, product_name, price
+        SELECT product_id, product_name, price
         FROM silver.products
-        ORDER BY id
+        ORDER BY product_id
         """
     ).fetchall()
 
@@ -72,10 +72,10 @@ def test_silver_incremental_processing_and_update_precedence(
     # 1005: new order is inserted.
     orders = conn.execute(
         """
-        SELECT id, status
+        SELECT order_id, status
         FROM silver.orders
-        WHERE id IN (1001, 1002, 1004, 1005)
-        ORDER BY id
+        WHERE order_id IN (1001, 1002, 1004, 1005)
+        ORDER BY order_id
         """
     ).fetchall()
 
@@ -93,10 +93,10 @@ def test_silver_incremental_processing_and_update_precedence(
     # 505: new order item is inserted.
     order_items = conn.execute(
         """
-        SELECT id, quantity, unit_price
+        SELECT order_item_id, quantity, unit_price
         FROM silver.order_items
-        WHERE id IN (501, 502, 504, 505)
-        ORDER BY id
+        WHERE order_item_id IN (501, 502, 504, 505)
+        ORDER BY order_item_id
         """
     ).fetchall()
 
@@ -114,10 +114,10 @@ def test_silver_incremental_processing_and_update_precedence(
     # 705: new shipment is inserted.
     shipments = conn.execute(
         """
-        SELECT id, carrier
+        SELECT shipment_id, carrier
         FROM silver.shipments
-        WHERE id IN (701, 702, 704, 705)
-        ORDER BY id
+        WHERE shipment_id IN (701, 702, 704, 705)
+        ORDER BY shipment_id
         """
     ).fetchall()
 

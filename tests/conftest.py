@@ -51,6 +51,7 @@ def postgres_warehouse_conn(postgres_warehouse_container):
         cur.execute("DROP SCHEMA IF EXISTS bronze CASCADE;")
         cur.execute("DROP SCHEMA IF EXISTS meta CASCADE;")
         cur.execute("DROP SCHEMA IF EXISTS silver CASCADE;")
+        cur.execute("DROP SCHEMA IF EXISTS gold CASCADE;")
         cur.execute(SCHEMA_FILE.read_text())
     conn.commit()
 

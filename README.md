@@ -39,8 +39,8 @@ See [`seed/generate_seed_data.py`](seed/generate_seed_data.py).
 - [x] PostgreSQL bronze landing layer with Docker Compose
 - [x] Unit and integration tests (`pytest`, real PostgreSQL via `testcontainers`)
 - [x] CI workflow on push and pull request: lint (`ruff`), type check (`mypy`), tests (`pytest`)
-- [ ] Pydantic validation and record quarantine / dead-letter store
-- [ ] dbt: staging models, `dim_customers`, `dim_products`, `dim_date`, gold-layer facts
+- [x] Pydantic validation and record quarantine store
+- [x] dbt: silver models, `dim_customers`, `dim_products`, `dim_date`, gold-layer facts
 - [ ] Airflow orchestration
 
 ## Technology stack
@@ -50,8 +50,8 @@ See [`seed/generate_seed_data.py`](seed/generate_seed_data.py).
 | Language | Python 3.14 |
 | Storage | PostgreSQL (source + warehouse) |
 | Testing | `pytest`, `testcontainers` |
-| Linting / typing | `ruff`, `mypy` |
-| Transformation (planned) | dbt |
+| Linting / typing | `ruff`, `mypy`, `sqlfluff` |
+| Transformation | dbt |
 | Orchestration (planned) | Apache Airflow |
 | Containerization | Docker Compose |
 

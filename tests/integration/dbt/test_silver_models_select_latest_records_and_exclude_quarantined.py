@@ -30,9 +30,9 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     # Customers: latest version retained; quarantined customer excluded.
     customers = postgres_warehouse_conn.execute(
         """
-        SELECT id, email, city, signup_date
+        SELECT customer_id, email, city, signup_date
         FROM silver.customers
-        ORDER BY id
+        ORDER BY customer_id
         """
     ).fetchall()
 
@@ -44,9 +44,9 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     # Products: latest price retained; quarantined product excluded.
     products = postgres_warehouse_conn.execute(
         """
-        SELECT id, sku, product_name, price
+        SELECT product_id, sku, product_name, price
         FROM silver.products
-        ORDER BY id
+        ORDER BY product_id
         """
     ).fetchall()
 
@@ -58,9 +58,9 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     # Orders: latest status retained; quarantined order excluded.
     orders = postgres_warehouse_conn.execute(
         """
-        SELECT id, customer_id, status, payment_method
+        SELECT order_id, customer_id, status, payment_method
         FROM silver.orders
-        ORDER BY id
+        ORDER BY order_id
         """
     ).fetchall()
 
@@ -72,9 +72,9 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     # Order items: latest quantity and unit price retained.
     order_items = postgres_warehouse_conn.execute(
         """
-        SELECT id, order_id, product_id, quantity, unit_price
+        SELECT order_item_id, order_id, product_id, quantity, unit_price
         FROM silver.order_items
-        ORDER BY id
+        ORDER BY order_item_id
         """
     ).fetchall()
 
@@ -86,9 +86,9 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     # Shipments: latest delivery state retained; null timestamps preserved.
     shipments = postgres_warehouse_conn.execute(
         """
-        SELECT id, carrier, delivered_at IS NULL
+        SELECT shipment_id, carrier, delivered_at IS NULL
         FROM silver.shipments
-        ORDER BY id
+        ORDER BY shipment_id
         """
     ).fetchall()
 

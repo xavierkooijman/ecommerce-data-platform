@@ -1,0 +1,24 @@
+models:
+  - name: dim_product
+    description: "Product dimension"
+    columns:
+      - name: product_sk
+        description: "Deterministic surrogate key generated from the source product ID."
+        tests:
+          - unique
+          - not_null
+
+      - name: product_id
+        description: "Source system product identifier."
+        tests:
+          - unique
+          - not_null
+
+      - name: product_name
+        description: "The name of the product."
+
+      - name: category
+        description: "The category of the product."
+
+      - name: price
+        description: "The price of the product."

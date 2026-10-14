@@ -5,6 +5,6 @@ snapshots:
     config:
       schema: silver
       strategy: timestamp
-      unique_key: id
+      unique_key: customer_id
       updated_at: updated_at
       hard_deletes: ignore

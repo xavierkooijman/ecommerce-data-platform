@@ -7,7 +7,7 @@ models:
         tests:
           - not_null
           - unique
-      - name: id
+      - name: product_id
         description: "The unique identifier for the product."
         tests:
           - not_null

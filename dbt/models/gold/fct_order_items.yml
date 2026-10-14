@@ -1,0 +1,48 @@
+models:
+  - name: fct_order_items
+    description: Fact table for order items
+    columns:
+      - name: order_item_sk
+        description: Surrogate key for the order item
+        tests:
+          - unique
+          - not_null
+          
+      - name: order_item_id
+        description: Source system order item identifier
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_sk
+        description: Surrogate key for the customer
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_sk
+
+      - name: product_sk
+        description: Surrogate key for the product
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_sk
+
+      - name: quantity
+        description: Quantity of the product ordered
+
+      - name: unit_price
+        description: Price per unit of the product
+
+      - name: order_date_sk
+        description: Surrogate key for the order date
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_sk

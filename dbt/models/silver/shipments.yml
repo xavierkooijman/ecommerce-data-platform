@@ -7,7 +7,7 @@ models:
         tests:
           - not_null
           - unique
-      - name: id
+      - name: shipment_id
         description: "The unique identifier for the shipment."
         tests:
           - not_null
