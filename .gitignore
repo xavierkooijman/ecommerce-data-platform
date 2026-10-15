@@ -23,3 +23,9 @@ logs/
 
 #vscode
 .vscode/
+
+#airflow
+airflow/dags/pycache/
+airflow/logs/
+airflow/config/airflow.cfg
+airflow/plugins/pycache/
