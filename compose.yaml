@@ -118,6 +118,11 @@ services:
     environment:
       DBT_PROFILES_DIR: '/opt/airflow/ecommerce-data-platform/dbt'
       WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?WAREHOUSE_DB_PASSWORD must be set}
+      WAREHOUSE_DB_HOST: warehouse_db
+      WAREHOUSE_DB_PORT: 5432
+      SOURCE_DB_PASSWORD: ${SOURCE_DB_PASSWORD:?SOURCE_DB_PASSWORD must be set}
+      SOURCE_DB_HOST: source_db
+      SOURCE_DB_PORT: 5432
     command: scheduler
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']

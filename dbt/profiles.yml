@@ -2,9 +2,9 @@ ecommerce_data_platform:
   outputs:
     dev:
       dbname: warehouse
-      host: localhost
+      host: "{{ env_var('WAREHOUSE_DB_HOST', 'localhost') }}"
       pass: "{{ env_var('WAREHOUSE_DB_PASSWORD') }}"
-      port: 5433
+      port: "{{ env_var('WAREHOUSE_DB_PORT', '5433') | as_number }}"
       schema: dbt
       threads: 2
       type: postgres
@@ -18,14 +18,4 @@ ecommerce_data_platform:
       threads: 2
       type: postgres
       user: ci_user
-
-    airflow:
-      dbname: warehouse
-      host: warehouse_db
-      pass: "{{ env_var('WAREHOUSE_DB_PASSWORD') }}"
-      port: 5432
-      schema: dbt
-      threads: 2
-      type: postgres
-      user: warehouse_user
-  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  target: "{{ env_var('DBT_TARGET') }}"
