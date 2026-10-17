@@ -4,7 +4,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /usr/local/bin/
 
 USER root
 
-WORKDIR /opt/airflow/ecommerce-data-platform
+WORKDIR /opt/airflow/ecommerce_data_platform
 
 # Export the locked dependencies to a requirements.txt file, install airflow and then install the dependencies.
 COPY --chown=airflow:root pyproject.toml uv.lock ./

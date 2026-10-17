@@ -116,7 +116,9 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     environment:
-      DBT_PROFILES_DIR: '/opt/airflow/ecommerce-data-platform/dbt'
+      <<: *airflow-common-env
+      DBT_PROFILES_DIR: '/opt/airflow/ecommerce_data_platform/dbt'
+      DBT_TARGET: 'dev'
       WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?WAREHOUSE_DB_PASSWORD must be set}
       WAREHOUSE_DB_HOST: warehouse_db
       WAREHOUSE_DB_PORT: 5432

@@ -23,7 +23,9 @@ def run_incremental_ingestion(table: str) -> None:
         with source_connection() as source_conn:
             records = PostgresIncrementalExtractor(source_conn).extract(table, watermark)
 
-        
+        if not records:
+            return
+
         with warehouse_conn.transaction():
             PostgresLandingStore(warehouse_conn).persist(table, records)
             new_checkpoint = max(record["updated_at"] for record in records)

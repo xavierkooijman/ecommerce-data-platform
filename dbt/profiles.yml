@@ -18,4 +18,4 @@ ecommerce_data_platform:
       threads: 2
       type: postgres
       user: ci_user
-  target: "{{ env_var('DBT_TARGET') }}"
+  target: "{{ env_var('DBT_TARGET'), 'dev' }}"
