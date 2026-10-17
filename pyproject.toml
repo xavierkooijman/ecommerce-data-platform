@@ -22,6 +22,9 @@ transform = [
     "dbt-postgres>=1.11.0",
 ]
 
+[tool.uv]
+  default-groups = ["dev", "transform"]
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"

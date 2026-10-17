@@ -29,6 +29,7 @@ x-airflow-common:
   build:
     context: .
     dockerfile: Dockerfile
+    target: runtime
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -119,6 +120,8 @@ services:
       <<: *airflow-common-env
       DBT_DIR: '/opt/airflow/ecommerce_data_platform/dbt'
       DBT_PROFILES_DIR: '/opt/airflow/ecommerce_data_platform/dbt'
+      DBT_LOG_PATH: '/tmp/dbt/logs'
+      DBT_TARGET_PATH: '/tmp/dbt/target'
       DBT_TARGET: 'dev'
       WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?WAREHOUSE_DB_PASSWORD must be set}
       WAREHOUSE_DB_HOST: warehouse_db

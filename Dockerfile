@@ -1,13 +1,47 @@
-FROM apache/airflow:3.3.2-python3.14
+# base: Airflow + runtime deps + src (no dbt, no pytest)
+FROM apache/airflow:3.3.2-python3.14 AS base
 
 COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /usr/local/bin/
 
-USER root
-
 WORKDIR /opt/airflow/ecommerce_data_platform
 
-# Export the locked dependencies to a requirements.txt file, install airflow and then install the dependencies.
 COPY --chown=airflow:root pyproject.toml uv.lock ./
+
+RUN uv export \
+        --locked \
+        --no-dev \
+        --no-emit-project \
+        --format requirements-txt \
+        -o /tmp/requirements.txt \
+    && uv pip install \
+        --no-cache \
+        --python "$(which python)" \
+        --constraint "/home/airflow/constraints.txt" \
+        "apache-airflow==${AIRFLOW_VERSION}" \
+    && uv pip install \
+        --no-cache \
+        --python "$(which python)" \
+        "apache-airflow==${AIRFLOW_VERSION}" \
+        -r /tmp/requirements.txt
+
+COPY --chown=airflow:root src/ ./src/
+
+RUN uv pip install --no-cache --python "$(which python)" --no-deps .
+
+
+# test: base + pytest + dags + airflow tests
+FROM base AS test
+
+RUN uv pip install --no-cache --python "$(which python)" pytest
+
+COPY --chown=airflow:root airflow/dags/ ./airflow/dags/
+COPY --chown=airflow:root tests/airflow/ ./tests/airflow/
+
+CMD ["python", "-m", "pytest", "tests/airflow", "-v"]
+
+
+# runtime: base + dbt
+FROM base AS runtime
 
 RUN uv export \
         --locked \
@@ -17,24 +51,11 @@ RUN uv export \
         --format requirements-txt \
         -o /tmp/requirements.txt \
     && uv pip install \
-        --system \
         --no-cache \
-        --constraint "/home/airflow/constraints.txt" \
-        "apache-airflow==${AIRFLOW_VERSION}" \
-    && uv pip install \
-        --system \
-        --no-cache \
+        --python "$(which python)" \
         "apache-airflow==${AIRFLOW_VERSION}" \
         -r /tmp/requirements.txt
 
-# Add the src directory.
-COPY --chown=airflow:root src/ ./src/
-
-RUN uv pip install --system --no-deps .
-
-USER airflow
-
-# Add the dbt directory and its packages.
 COPY --chown=airflow:root dbt/ ./dbt/
 
 RUN cd dbt && dbt deps
