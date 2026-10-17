@@ -117,6 +117,7 @@ services:
     <<: *airflow-common
     environment:
       <<: *airflow-common-env
+      DBT_DIR: '/opt/airflow/ecommerce_data_platform/dbt'
       DBT_PROFILES_DIR: '/opt/airflow/ecommerce_data_platform/dbt'
       DBT_TARGET: 'dev'
       WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?WAREHOUSE_DB_PASSWORD must be set}
