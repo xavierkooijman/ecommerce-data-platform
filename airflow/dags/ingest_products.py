@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
-from airflow.sdk import Asset, dag, task
+from airflow.sdk import dag, task
+from assets import PRODUCTS_READY
 
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
 from ecommerce_data_platform.validation.models import Product
 
-PRODUCTS_READY = Asset("products_ready")
 
 @dag(
     dag_id="ingest_products",
