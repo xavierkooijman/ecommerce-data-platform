@@ -7,9 +7,20 @@ on:
       - main
 
 jobs:
-  ci:
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: true
+      - run: uv python install
+      - run: uv sync --locked --dev
+      - run: uv run ruff check .
+      - run: uv run mypy src
 
+  dbt-lint:
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:18
@@ -24,35 +35,38 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: true
+      - run: uv python install
+      - run: uv sync --locked --dev --group transform
+      - run: uv run dbt deps --project-dir dbt/
+      - run: uv run sqlfluff lint dbt/
+        env:
+          DBT_TARGET: ci
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: true
+      - run: uv python install
+      - run: uv sync --locked --dev --group transform
+      - run: uv run dbt deps --project-dir dbt/
+      - run: uv run pytest --ignore=tests/airflow
+
+  airflow-tests:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
-        with:
-          enable-cache: true
+      - name: Build Airflow test image
+        run: docker build --target test -t ecommerce-airflow-test .
 
-      - name: Set up Python
-        run: uv python install
-
-      - name: Install dependencies
-        run: uv sync --locked --dev
-
-      - name: Lint
-        run: uv run ruff check .
-
-      - name: Type check
-        run: uv run mypy src
-
-      - name: Install dbt packages
-        run: uv run dbt deps --project-dir dbt/
-
-      - name: Lint dbt SQL
-        run: uv run sqlfluff lint dbt/
-        env:
-          DBT_TARGET: ci
-
-      - name: Test
-        run: uv run pytest
+      - name: Run Airflow tests
+        run: docker run --rm ecommerce-airflow-test

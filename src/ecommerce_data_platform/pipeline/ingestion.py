@@ -1,27 +1,17 @@
 from datetime import datetime
 
-import psycopg
-
-from ecommerce_data_platform.extract.base import IncrementalExtractor
-from ecommerce_data_platform.storage.base import CheckpointStore, LandingStore
+from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
+from ecommerce_data_platform.storage.postgres import PostgresCheckpointStore, PostgresLandingStore
 from ecommerce_data_platform.types import PipelineStage
+from ecommerce_data_platform.utils.db import source_connection, warehouse_connection
 
 
-class EcommerceIncrementalIngestion:
-    def __init__(
-        self,
-        extractor: IncrementalExtractor,
-        landing_store: LandingStore,
-        checkpoint_store: CheckpointStore,
-        warehouse_conn: psycopg.Connection,
-    ):
-        self._extractor = extractor
-        self._landing_store = landing_store
-        self._checkpoint_store = checkpoint_store
-        self._warehouse_conn = warehouse_conn
+def run_incremental_ingestion(table: str) -> None:
 
-    def run(self, table: str) -> None:
-        checkpoint = self._checkpoint_store.get(PipelineStage.INGESTION, table)
+    with warehouse_connection() as warehouse_conn:
+        checkpoint_store = PostgresCheckpointStore(warehouse_conn)
+        checkpoint = checkpoint_store.get(PipelineStage.INGESTION, table)
+        warehouse_conn.commit()
 
         if checkpoint is not None and not isinstance(checkpoint, datetime):
             raise TypeError(
@@ -30,20 +20,15 @@ class EcommerceIncrementalIngestion:
 
         watermark = checkpoint
 
-        records = self._extractor.extract(
-            table,
-            watermark
-        )
+        with source_connection() as source_conn:
+            records = PostgresIncrementalExtractor(source_conn).extract(table, watermark)
 
         if not records:
             return
 
-        try:
-            self._landing_store.persist(table, records)
+        with warehouse_conn.transaction():
+            PostgresLandingStore(warehouse_conn).persist(table, records)
             new_checkpoint = max(record["updated_at"] for record in records)
-            self._checkpoint_store.set(PipelineStage.INGESTION, table, new_checkpoint)
-            self._warehouse_conn.commit()
-        except Exception:
-            self._warehouse_conn.rollback()
-            raise
+            checkpoint_store.set(PipelineStage.INGESTION, table, new_checkpoint)
+
 

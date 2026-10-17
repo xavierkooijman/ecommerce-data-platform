@@ -475,14 +475,16 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "dbt-core" },
-    { name = "dbt-postgres" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "ruff" },
     { name = "sqlfluff" },
     { name = "sqlfluff-templater-dbt" },
     { name = "testcontainers" },
+]
+transform = [
+    { name = "dbt-core" },
+    { name = "dbt-postgres" },
 ]
 
 [package.metadata]
@@ -494,14 +496,16 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dbt-core", specifier = ">=1.12.5" },
-    { name = "dbt-postgres", specifier = ">=1.11.0" },
     { name = "mypy", specifier = ">=2.3.1" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.16.9" },
     { name = "sqlfluff", specifier = ">=4.4.0" },
     { name = "sqlfluff-templater-dbt", specifier = ">=4.4.0" },
     { name = "testcontainers", extras = ["postgres"], specifier = ">=4.15.0" },
+]
+transform = [
+    { name = "dbt-core", specifier = ">=1.12.5" },
+    { name = "dbt-postgres", specifier = ">=1.11.0" },
 ]
 
 [[package]]

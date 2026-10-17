@@ -699,11 +699,6 @@ def reset_sequences(conn: psycopg.Connection) -> None:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    dsn = os.environ.get(
-        "SOURCE_DB_DSN",
-        "postgresql://postgres:postgres@localhost:5432/source_db",
-    )
-
     data = generate_all()
 
     print(
@@ -715,7 +710,13 @@ if __name__ == "__main__":
         f"{len(data.shipments)} shipments"
     )
 
-    with psycopg.connect(dsn) as conn:
+    with psycopg.connect(
+        host=os.getenv("SOURCE_DB_HOST", "localhost"),
+        port=os.getenv("SOURCE_DB_PORT", "5432"),
+        user="source_user",
+        password=os.environ["SOURCE_DB_PASSWORD"],
+        dbname="source",
+    ) as conn:
         load_into_postgres(conn, data)
         reset_sequences(conn)
         conn.commit()
