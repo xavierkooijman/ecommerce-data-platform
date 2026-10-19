@@ -1,7 +1,12 @@
 from typing import Any, Protocol
 
 from ecommerce_data_platform.records import BronzeRecord, RejectedRecord
-from ecommerce_data_platform.types import Checkpoint, PipelineStage, QuarantineStatus
+from ecommerce_data_platform.types import (
+    Checkpoint,
+    PipelineRun,
+    PipelineStage,
+    QuarantineStatus,
+)
 
 
 class LandingStore(Protocol):
@@ -21,3 +26,8 @@ class QuarantineStore(Protocol):
     ) -> None: ...
 
     def resolve(self, quarantine_id: int, status: QuarantineStatus) -> None: ...
+
+class PipelineRunsStore(Protocol):
+    def start(self, run: PipelineRun) -> None: ...
+
+    def finish(self, run: PipelineRun) -> None: ...

@@ -57,3 +57,22 @@ CREATE TABLE IF NOT EXISTS meta.quarantine (
         OR (status != 'open' AND resolved_at IS NOT NULL)
     )
 );
+
+CREATE TABLE IF NOT EXISTS meta.pipeline_runs (
+    run_id TEXT NOT NULL,
+    dag_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    try_number INTEGER NOT NULL DEFAULT 1,
+    stage TEXT NOT NULL,
+    source_table TEXT,
+    status TEXT NOT NULL CHECK (status IN ('running', 'success', 'failed')),
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    finished_at TIMESTAMPTZ,
+    rows_extracted INTEGER,
+    rows_loaded INTEGER,
+    rows_inspected INTEGER,
+    rows_rejected INTEGER,
+    watermark TIMESTAMPTZ,
+    error_message TEXT,
+    PRIMARY KEY (run_id, task_id, try_number)
+);

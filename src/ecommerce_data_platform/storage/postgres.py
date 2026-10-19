@@ -6,7 +6,12 @@ from psycopg import sql
 from psycopg.types.json import Jsonb
 
 from ecommerce_data_platform.records import BronzeRecord, RejectedRecord
-from ecommerce_data_platform.types import Checkpoint, PipelineStage, QuarantineStatus
+from ecommerce_data_platform.types import (
+    Checkpoint,
+    PipelineRun,
+    PipelineStage,
+    QuarantineStatus,
+)
 from ecommerce_data_platform.utils.checkpoints import checkpoint_to_columns, columns_to_checkpoint
 from ecommerce_data_platform.utils.json import json_default
 
@@ -146,6 +151,70 @@ class PostgresQuarantineStore:
                 WHERE quarantine_id = %s
             """
             cur.execute(query, (status, quarantine_id))
+
+class PostgresPipelineRunsStore:
+    def __init__(self, conn: psycopg.Connection):
+        self._conn = conn
+
+    def start(self, run: PipelineRun) -> None:
+        with self._conn.cursor() as cur:
+            query = """
+                INSERT INTO meta.pipeline_runs (
+                    run_id,
+                    task_id,
+                    dag_id,
+                    try_number,
+                    stage,
+                    source_table,
+                    status,
+                    started_at
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cur.execute(
+                query,
+                (
+                    run.execution_context.run_id,
+                    run.execution_context.task_id,
+                    run.execution_context.dag_id,
+                    run.execution_context.try_number,
+                    run.stage,
+                    run.source_table,
+                    run.status,
+                    run.started_at,
+                ),
+            )
+
+    def finish(self, run: PipelineRun) -> None:
+        with self._conn.cursor() as cur:
+            query = """
+                UPDATE meta.pipeline_runs
+                SET status = %s,
+                    finished_at = %s,
+                    rows_extracted = %s,
+                    rows_loaded = %s,
+                    rows_inspected = %s,
+                    rows_rejected = %s,
+                    watermark = %s,
+                    error_message = %s
+                WHERE run_id = %s AND task_id = %s AND try_number = %s
+            """
+            cur.execute(
+                query,
+                (
+                    run.status,
+                    run.finished_at,
+                    run.rows_extracted,
+                    run.rows_loaded,
+                    run.rows_inspected,
+                    run.rows_rejected,
+                    run.watermark,
+                    run.error_message,
+                    run.execution_context.run_id,
+                    run.execution_context.task_id,
+                    run.execution_context.try_number,
+                ),
+            )
         
         
         

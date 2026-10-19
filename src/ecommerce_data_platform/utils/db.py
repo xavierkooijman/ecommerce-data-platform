@@ -10,6 +10,7 @@ def warehouse_connection() -> psycopg.Connection:
         user="warehouse_user",
         password=os.environ["WAREHOUSE_DB_PASSWORD"],
         dbname="warehouse",
+        autocommit=True,
     )
 
 
@@ -20,4 +21,5 @@ def source_connection() -> psycopg.Connection:
         user="source_user",
         password=os.environ["SOURCE_DB_PASSWORD"],
         dbname="source",
+        autocommit=True,
     )
