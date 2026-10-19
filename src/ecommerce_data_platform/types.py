@@ -4,6 +4,14 @@ from enum import StrEnum
 
 type Checkpoint = int | datetime
 
+class SourceTable(StrEnum):
+    CUSTOMERS = "customers"
+    PRODUCTS = "products"
+    ORDERS = "orders"
+    ORDER_ITEMS = "order_items"
+    SHIPMENTS = "shipments"
+    
+
 class QuarantineStatus(StrEnum):
     OPEN = "open"
     REVALIDATED = "revalidated"
@@ -13,7 +21,6 @@ class QuarantineStatus(StrEnum):
 class PipelineStage(StrEnum):
     INGESTION = "ingestion"
     VALIDATION = "validation"
-    TRANSFORMATION = "transformation"
 
 
 @dataclass(frozen=True)

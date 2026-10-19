@@ -215,6 +215,52 @@ class PostgresPipelineRunsStore:
                     run.execution_context.try_number,
                 ),
             )
+
+    def get_consecutive_zero_row_runs(self, source_table: str) -> int:
+        with self._conn.cursor() as cur:
+            query = """
+                WITH recent_runs AS (
+                    SELECT
+                        ROW_NUMBER() OVER(
+                            ORDER BY finished_at DESC
+                        ) AS rn,
+                        rows_extracted
+                    FROM meta.pipeline_runs
+                    WHERE
+                        status = 'success'
+                        AND source_table = %s
+                        AND stage = %s
+                )
+
+                SELECT COUNT(*)
+                FROM recent_runs
+                WHERE rows_extracted = 0
+                    AND rn < (
+                        SELECT COALESCE(
+                            MIN(rn) FILTER (WHERE rows_extracted > 0), 
+                            COUNT(*)
+                        )
+                        FROM recent_runs
+                )
+            """
+
+            cur.execute(query, (source_table, PipelineStage.INGESTION))
+            row = cur.fetchone()
+            return row[0] if row else 0
+
+    def get_rows_inspected_and_rejected_from_latest_run(self, source_table: str) -> tuple[int, int]:
+        with self._conn.cursor() as cur:
+            query = """
+                SELECT 
+                    rows_inspected,
+                    rows_rejected
+                FROM meta.pipeline_runs
+                WHERE status = 'success' AND source_table = %s AND stage = %s
+                ORDER BY finished_at DESC
+                LIMIT 1
+            """
+            cur.execute(query, (source_table, PipelineStage.VALIDATION))
+            return cur.fetchone() or (0, 0)
         
         
         
