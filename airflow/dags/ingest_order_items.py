@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow.sdk import dag, task
 from assets import ORDER_ITEMS_READY
+from helpers import get_execution_context
 
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
@@ -18,11 +19,11 @@ from ecommerce_data_platform.validation.models import OrderItem
 def order_items_dag():
     @task
     def ingest_order_items():
-        run_incremental_ingestion("order_items")
+        run_incremental_ingestion("order_items", get_execution_context())
 
     @task(outlets=[ORDER_ITEMS_READY])
     def validate_order_items():
-        run_bronze_validation("order_items", OrderItem)
+        run_bronze_validation("order_items", OrderItem, get_execution_context())
 
     ingest_order_items() >> validate_order_items()
 

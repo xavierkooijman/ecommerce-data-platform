@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow.sdk import dag, task
 from assets import CUSTOMERS_READY
+from helpers import get_execution_context
 
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
@@ -18,11 +19,11 @@ from ecommerce_data_platform.validation.models import Customer
 def customers_dag():
     @task
     def ingest_customers():
-        run_incremental_ingestion("customers")
+        run_incremental_ingestion("customers", get_execution_context())
 
     @task(outlets=[CUSTOMERS_READY])
     def validate_customers():
-        run_bronze_validation("customers", Customer)
+        run_bronze_validation("customers", Customer, get_execution_context())
 
     ingest_customers() >> validate_customers()
 

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow.sdk import dag, task
 from assets import SHIPMENTS_READY
+from helpers import get_execution_context
 
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
@@ -18,11 +19,11 @@ from ecommerce_data_platform.validation.models import Shipment
 def shipments_dag():
     @task
     def ingest_shipments():
-        run_incremental_ingestion("shipments")
+        run_incremental_ingestion("shipments", get_execution_context())
 
     @task(outlets=[SHIPMENTS_READY])
     def validate_shipments():
-        run_bronze_validation("shipments", Shipment)
+        run_bronze_validation("shipments", Shipment, get_execution_context())
 
     ingest_shipments() >> validate_shipments()
 
