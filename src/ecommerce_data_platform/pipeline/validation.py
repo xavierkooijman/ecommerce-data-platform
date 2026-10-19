@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from ecommerce_data_platform.observability import PipelineRunTracker
+from ecommerce_data_platform.observability.pipeline_run_tracker import PipelineRunTracker
 from ecommerce_data_platform.storage.postgres import (
     PostgresBronzeReader,
     PostgresCheckpointStore,

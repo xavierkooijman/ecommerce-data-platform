@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
-from ecommerce_data_platform.observability import PipelineRunTracker
+from ecommerce_data_platform.observability.pipeline_run_tracker import PipelineRunTracker
 from ecommerce_data_platform.storage.postgres import (
     PostgresCheckpointStore,
     PostgresLandingStore,

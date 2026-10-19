@@ -1,7 +1,6 @@
-
 from airflow.sdk import get_current_context
 
-from ecommerce_data_platform.observability import ExecutionContext
+from ecommerce_data_platform.types import ExecutionContext
 
 
 def get_execution_context() -> ExecutionContext:
