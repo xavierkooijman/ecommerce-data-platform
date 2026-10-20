@@ -34,6 +34,7 @@ def run_bronze_validation(
 
             records = PostgresBronzeReader().read(table, last_id)
             run.rows_inspected = len(records)
+            run.rows_rejected = 0
             if not records:
                 return
             

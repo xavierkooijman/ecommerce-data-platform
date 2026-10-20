@@ -33,6 +33,8 @@ def run_incremental_ingestion(table: str, execution_context: ExecutionContext) -
             records = PostgresIncrementalExtractor().extract(table, watermark)
 
             run.rows_extracted = len(records)
+            run.rows_loaded = 0
+            run.watermark = watermark
 
             if not records:
                 return
