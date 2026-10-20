@@ -15,13 +15,13 @@ from ecommerce_data_platform.validation.validator import validate
 def run_bronze_validation(
     table: str, model: type[BaseModel], execution_context: ExecutionContext
 ) -> None:
-    with warehouse_connection() as warehouse_conn:
-        with PipelineRunTracker(
-            stage=PipelineStage.VALIDATION,
-            store=PostgresPipelineRunsStore(warehouse_conn),
-            source_table=table,
-            execution_context=execution_context,
-        ) as run:
+    with PipelineRunTracker(
+        stage=PipelineStage.VALIDATION,
+        store=PostgresPipelineRunsStore(),
+        source_table=table,
+        execution_context=execution_context,
+    ) as run:
+        with warehouse_connection() as warehouse_conn:
             checkpoint_store = PostgresCheckpointStore(warehouse_conn)
             checkpoint = checkpoint_store.get(PipelineStage.VALIDATION, table)
 
@@ -32,7 +32,7 @@ def run_bronze_validation(
 
             last_id = checkpoint
 
-            records = PostgresBronzeReader(warehouse_conn).read(table, last_id)
+            records = PostgresBronzeReader().read(table, last_id)
             run.rows_inspected = len(records)
             if not records:
                 return

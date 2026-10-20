@@ -8,18 +8,18 @@ from ecommerce_data_platform.storage.postgres import (
     PostgresPipelineRunsStore,
 )
 from ecommerce_data_platform.types import ExecutionContext, PipelineStage
-from ecommerce_data_platform.utils.db import source_connection, warehouse_connection
+from ecommerce_data_platform.utils.db import warehouse_connection
 
 
 def run_incremental_ingestion(table: str, execution_context: ExecutionContext) -> None:
 
-    with warehouse_connection() as warehouse_conn:
-        with PipelineRunTracker(
-            stage=PipelineStage.INGESTION,
-            store=PostgresPipelineRunsStore(warehouse_conn),
-            source_table=table,
-            execution_context=execution_context,
-        ) as run:
+    with PipelineRunTracker(
+        stage=PipelineStage.INGESTION,
+        store=PostgresPipelineRunsStore(),
+        source_table=table,
+        execution_context=execution_context,
+    ) as run:
+        with warehouse_connection() as warehouse_conn:
             checkpoint_store = PostgresCheckpointStore(warehouse_conn)
             checkpoint = checkpoint_store.get(PipelineStage.INGESTION, table)
 
@@ -30,8 +30,7 @@ def run_incremental_ingestion(table: str, execution_context: ExecutionContext) -
 
             watermark = checkpoint
 
-            with source_connection() as source_conn:
-                records = PostgresIncrementalExtractor(source_conn).extract(table, watermark)
+            records = PostgresIncrementalExtractor().extract(table, watermark)
 
             run.rows_extracted = len(records)
 
