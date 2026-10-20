@@ -3,6 +3,7 @@ from datetime import datetime
 
 from airflow.sdk import dag, task
 from assets import CUSTOMERS_READY, PRODUCTS_READY
+from callbacks import webhook_task_failure_callback
 
 DBT_DIR = os.getenv("DBT_DIR", "/opt/airflow/ecommerce_data_platform/dbt")
 
@@ -12,6 +13,7 @@ DBT_DIR = os.getenv("DBT_DIR", "/opt/airflow/ecommerce_data_platform/dbt")
     start_date=datetime(2026, 1, 1),
     catchup=False,
     max_active_runs=1,
+    on_failure_callback=webhook_task_failure_callback
 )
 def transform_dimensions():
     @task.bash(cwd=DBT_DIR)
