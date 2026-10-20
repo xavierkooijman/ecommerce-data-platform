@@ -18,7 +18,7 @@ def check_consecutive_zero_row_runs(
         )
     return None
 
-def check_rejection_rate(
+def check_rejection_rate_percentage(
     store: PipelineRunsStore, source_table: SourceTable, threshold: float
 ) -> TriggeredCheck | None:
     rows_inspected, rows_rejected = (
@@ -29,11 +29,11 @@ def check_rejection_rate(
     if rows_inspected == 0:
         return None
 
-    rejection_rate = rows_rejected / rows_inspected
+    rejection_rate = rows_rejected / rows_inspected * 100
     
     if rejection_rate >= threshold:
         return TriggeredCheck(
-            name="rejection_rate",
+            name="rejection_rate_percentage",
             source_table=source_table,
             observed_value=rejection_rate,
             threshold=threshold,
