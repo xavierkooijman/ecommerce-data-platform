@@ -8,7 +8,8 @@ from helpers import get_execution_context
 from ecommerce_data_platform.observability.checks_runner import run_checks
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
-from ecommerce_data_platform.validation.models import Customer, SourceTable
+from ecommerce_data_platform.types import SourceTable
+from ecommerce_data_platform.validation.models import Customer
 
 
 @dag(
@@ -24,14 +25,14 @@ def customers_dag():
     def ingest_customers():
         run_incremental_ingestion(SourceTable.CUSTOMERS, get_execution_context())
 
-    @task(outlets=[CUSTOMERS_READY])
+    @task
     def validate_customers():
         run_bronze_validation(SourceTable.CUSTOMERS, Customer, get_execution_context())
 
-    @task
-    def check_alerts():
+    @task(outlets=[CUSTOMERS_READY])
+    def check_customer_alerts():
         run_checks(SourceTable.CUSTOMERS)
 
-    ingest_customers() >> validate_customers() >> check_alerts()
+    ingest_customers() >> validate_customers() >> check_customer_alerts()
 
 customers_dag()

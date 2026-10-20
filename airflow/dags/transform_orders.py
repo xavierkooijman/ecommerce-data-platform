@@ -18,12 +18,12 @@ DBT_DIR = os.getenv("DBT_DIR", "/opt/airflow/ecommerce_data_platform/dbt")
 def transform_orders():
 
     @task.bash(cwd=DBT_DIR)
-    def build():
+    def build_orders():
         return (
             "dbt build "
             "--select orders order_items fct_orders fct_order_items"
         )
 
-    build()
+    build_orders()
 
 transform_orders()

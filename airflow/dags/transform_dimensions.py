@@ -17,13 +17,13 @@ DBT_DIR = os.getenv("DBT_DIR", "/opt/airflow/ecommerce_data_platform/dbt")
 )
 def transform_dimensions():
     @task.bash(cwd=DBT_DIR)
-    def build():
+    def build_dimensions():
         return (
             "dbt build "
             "--select customers products customers_snapshot dim_customer dim_product "
             "--indirect-selection cautious"
         )
 
-    build()
+    build_dimensions()
 
 transform_dimensions()
