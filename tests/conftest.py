@@ -38,6 +38,13 @@ def postgres_source_conn(postgres_source_container):
     conn.close()
 
 @pytest.fixture
+def patch_source_connection(monkeypatch, postgres_source_conn):
+    monkeypatch.setattr(
+        "ecommerce_data_platform.extract.postgres.source_connection",
+        lambda: postgres_source_conn,
+    )
+
+@pytest.fixture
 def postgres_warehouse_conn(postgres_warehouse_container):
     conn = psycopg.connect(
         host=postgres_warehouse_container.get_container_host_ip(),
@@ -57,6 +64,13 @@ def postgres_warehouse_conn(postgres_warehouse_container):
 
     yield conn
     conn.close()
+
+@pytest.fixture
+def patch_warehouse_connection(monkeypatch, postgres_warehouse_conn):
+    monkeypatch.setattr(
+        "ecommerce_data_platform.storage.postgres.warehouse_connection",
+        lambda: postgres_warehouse_conn,
+    )
 
 @pytest.fixture(scope="session")
 def dbt_profile(postgres_warehouse_container, tmp_path_factory):

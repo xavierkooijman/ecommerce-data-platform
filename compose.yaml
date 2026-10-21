@@ -123,6 +123,7 @@ services:
       DBT_LOG_PATH: '/tmp/dbt/logs'
       DBT_TARGET_PATH: '/tmp/dbt/target'
       DBT_TARGET: 'dev'
+      ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-}
       WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?WAREHOUSE_DB_PASSWORD must be set}
       WAREHOUSE_DB_HOST: warehouse_db
       WAREHOUSE_DB_PORT: 5432

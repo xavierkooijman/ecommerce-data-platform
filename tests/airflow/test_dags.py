@@ -34,32 +34,44 @@ def test_dags_load(dag_bag: DagBag) -> None:
     [
         (
             "ingest_customers",
-            {"ingest_customers", "validate_customers"},
-            {"validate_customers": {"ingest_customers"}},
+            {"ingest_customers", "validate_customers", "check_customer_alerts"},
+            {
+                "validate_customers": {"ingest_customers"},
+                "check_customer_alerts": {"validate_customers"},
+            },
         ),
         (
             "ingest_order_items",
-            {"ingest_order_items", "validate_order_items"},
-            {"validate_order_items": {"ingest_order_items"}},
+            {"ingest_order_items", "validate_order_items", "check_order_item_alerts"},
+            {
+                "validate_order_items": {"ingest_order_items"},
+                "check_order_item_alerts": {"validate_order_items"},
+            },
         ),
         (
             "ingest_orders",
-            {"ingest_orders", "validate_orders"},
-            {"validate_orders": {"ingest_orders"}},
+            {"ingest_orders", "validate_orders", "check_order_alerts"},
+            {"validate_orders": {"ingest_orders"}, "check_order_alerts": {"validate_orders"}},
         ),
         (
             "ingest_products",
-            {"ingest_products", "validate_products"},
-            {"validate_products": {"ingest_products"}},
+            {"ingest_products", "validate_products", "check_product_alerts"},
+            {
+                "validate_products": {"ingest_products"},
+                "check_product_alerts": {"validate_products"},
+            },
         ),
         (
             "ingest_shipments",
-            {"ingest_shipments", "validate_shipments"},
-            {"validate_shipments": {"ingest_shipments"}},
+            {"ingest_shipments", "validate_shipments", "check_shipment_alerts"},
+            {
+                "validate_shipments": {"ingest_shipments"},
+                "check_shipment_alerts": {"validate_shipments"},
+            },
         ),
-        ("transform_dimensions", {"build"}, {}),
-        ("transform_orders", {"build"}, {}),
-        ("transform_shipments", {"build"}, {}),
+        ("transform_dimensions", {"build_dimensions"}, {}),
+        ("transform_orders", {"build_orders"}, {}),
+        ("transform_shipments", {"build_shipments"}, {}),
     ],
 )
 def test_dag_structure(
@@ -77,45 +89,45 @@ def test_dag_structure(
 
 
 @pytest.mark.parametrize(
-    ("dag_id", "validate_task_id", "expected_asset_uri"),
+    ("dag_id", "check_alerts_task_id", "expected_asset_uri"),
     [
         (
             "ingest_customers",
-            "validate_customers",
+            "check_customer_alerts",
             "customers_ready",
         ),
         (
             "ingest_order_items",
-            "validate_order_items",
+            "check_order_item_alerts",
             "order_items_ready",
         ),
         (
             "ingest_orders",
-            "validate_orders",
+            "check_order_alerts",
             "orders_ready",
         ),
         (
             "ingest_products",
-            "validate_products",
+            "check_product_alerts",
             "products_ready",
         ),
         (
             "ingest_shipments",
-            "validate_shipments",
+            "check_shipment_alerts",
             "shipments_ready",
         ),
     ],
 )
-def test_validation_emits_expected_asset(
+def test_run_check_alerts_emits_expected_asset(
     dag_bag: DagBag,
     dag_id: str,
-    validate_task_id: str,
+    check_alerts_task_id: str,
     expected_asset_uri: str,
 ) -> None:
-    """Each validation task must declare its expected asset outlet."""
+    """Each check alerts task must declare its expected asset outlet."""
     dag = get_loaded_dag(dag_bag, dag_id)
 
-    validate_task = dag.get_task(validate_task_id)
-    asset_uris = {asset.uri for asset in validate_task.outlets}
+    check_alerts_task = dag.get_task(check_alerts_task_id)
+    asset_uris = {asset.uri for asset in check_alerts_task.outlets}
 
     assert expected_asset_uri in asset_uris

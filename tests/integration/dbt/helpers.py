@@ -10,6 +10,7 @@ def run_dbt(profiles_dir: Path, *args: str) -> None:
         [
             "uv", "run", "dbt", *args,
             "--profiles-dir", str(profiles_dir),
+            "--target", "test",
         ],
         cwd=DBT_DIR,
         check=True,

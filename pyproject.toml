@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
     "email-validator>=2.3.0",
+    "httpx>=0.28.1",
     "psycopg[binary]>=3.3.6",
     "pydantic>=2.13.5",
 ]
@@ -47,3 +48,6 @@ select = [
     "B",
     "UP",
 ]
+
+[tool.pytest.ini_options]
+addopts = "--ignore=tests/airflow"
