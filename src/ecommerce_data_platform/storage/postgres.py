@@ -67,15 +67,15 @@ class PostgresCheckpointStore:
         with self._connection_factory() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                """
-                SELECT checkpoint_ts, checkpoint_num 
-                FROM meta.checkpoints 
-                WHERE stage = %s AND source_system = %s AND resource = %s
-                """,
-                (stage, data_source.source_system, data_source.resource),
-            )
+                    """
+                    SELECT checkpoint_ts, checkpoint_num 
+                    FROM meta.checkpoints 
+                    WHERE stage = %s AND source_system = %s AND resource = %s
+                    """,
+                    (stage, data_source.source_system, data_source.resource),
+                )
 
-            row = cur.fetchone()
+                row = cur.fetchone()
 
         if row is None:
             return None
@@ -96,29 +96,29 @@ class PostgresCheckpointStore:
         with self._connection_factory() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                """
-                INSERT INTO meta.checkpoints (
-                    stage,
-                    source_system,
-                    resource,
-                    checkpoint_ts,
-                    checkpoint_num
+                    """
+                    INSERT INTO meta.checkpoints (
+                        stage,
+                        source_system,
+                        resource,
+                        checkpoint_ts,
+                        checkpoint_num
+                    )
+                    VALUES (%s, %s, %s, %s, %s)
+                    ON CONFLICT (stage, source_system, resource)
+                    DO UPDATE SET
+                        checkpoint_ts = EXCLUDED.checkpoint_ts,
+                        checkpoint_num = EXCLUDED.checkpoint_num,
+                        updated_at = NOW()
+                    """,
+                    (
+                        stage,
+                        data_source.source_system,
+                        data_source.resource,
+                        checkpoint_ts,
+                        checkpoint_num,
+                    ),
                 )
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (stage, source_system, resource)
-                DO UPDATE SET
-                    checkpoint_ts = EXCLUDED.checkpoint_ts,
-                    checkpoint_num = EXCLUDED.checkpoint_num,
-                    updated_at = NOW()
-                """,
-                (
-                    stage,
-                    data_source.source_system,
-                    data_source.resource,
-                    checkpoint_ts,
-                    checkpoint_num,
-                ),
-            )
 
 class PostgresQuarantineStore:
     def __init__(self, connection_factory: PostgresConnectionFactory):

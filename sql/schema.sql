@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS meta.quarantine (
         CHECK (status IN ('open', 'revalidated', 'superseded', 'wont_fix')),
     quarantined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     resolved_at TIMESTAMPTZ,
-    UNIQUE (source_system, resource, ingestion_id),
+    UNIQUE (bronze_table, ingestion_id),
     CHECK (
         (status = 'open' AND resolved_at IS NULL)
         OR (status != 'open' AND resolved_at IS NOT NULL)

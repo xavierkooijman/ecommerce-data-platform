@@ -9,45 +9,38 @@ from ecommerce_data_platform.observability.models import (
 )
 
 
-def test_run_checks_completes_when_no_checks_trigger(monkeypatch):
+def test_run_checks_completes_when_no_checks_trigger(monkeypatch, data_source):
     check = Mock(return_value=None)
+    store = Mock()
+
     monkeypatch.setattr(
         checks_runner,
         "CHECK_CONFIG",
-        {"customers": [Mock(check=check, threshold=3)]},
-    )
-    monkeypatch.setattr(
-        checks_runner,
-        "PostgresPipelineRunsStore",
-        Mock,
+        {data_source: [Mock(check=check, threshold=3)]},
     )
 
-    checks_runner.run_checks("customers")
+    checks_runner.run_checks(data_source, store)
 
-    check.assert_called_once()
+    check.assert_called_once_with(store, data_source, 3)
 
 
-def test_run_checks_raises_when_a_check_triggers(monkeypatch):
+def test_run_checks_raises_when_a_check_triggers(monkeypatch, data_source):
     alert = TriggeredCheck(
         name="consecutive_zero_row_runs",
-        source_table="customers",
+        data_source=data_source,
         observed_value=3,
         threshold=3,
     )
     check = Mock(return_value=alert)
+    store = Mock()
 
     monkeypatch.setattr(
         checks_runner,
         "CHECK_CONFIG",
-        {"customers": [Mock(check=check, threshold=3)]},
-    )
-    monkeypatch.setattr(
-        checks_runner,
-        "PostgresPipelineRunsStore",
-        Mock,
+        {data_source: [Mock(check=check, threshold=3)]},
     )
 
     with pytest.raises(CheckThresholdExceeded):
-        checks_runner.run_checks("customers")
+        checks_runner.run_checks(data_source, store)
 
-    check.assert_called_once()
+    check.assert_called_once_with(store, data_source, 3)
