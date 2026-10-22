@@ -5,10 +5,10 @@ from helpers import run_dbt
 
 
 def test_silver_incremental_processing_and_update_precedence(
-    postgres_warehouse_conn,
+    warehouse_connection_factory,
     dbt_profile,
 ):
-    conn = postgres_warehouse_conn
+    conn = warehouse_connection_factory()
 
     # Seed the initial Bronze state used to build Silver.
     baseline_seed = (

@@ -40,15 +40,15 @@ def _build_gold(dbt_profile):
 
 
 def test_gold_dimensions_and_facts(
-    postgres_warehouse_conn,
+    warehouse_connection_factory,
     dbt_profile,
 ):
-    _seed_bronze(postgres_warehouse_conn)
+    _seed_bronze(warehouse_connection_factory())
     _build_silver(dbt_profile)
     _build_gold(dbt_profile)
 
     # Product dimension: latest Silver values and unknown member.
-    products = postgres_warehouse_conn.execute(
+    products = warehouse_connection_factory().execute(
         """
         SELECT product_id, product_name, price
         FROM gold.dim_product
@@ -63,7 +63,7 @@ def test_gold_dimensions_and_facts(
     ]
 
     # Customer dimension: current customer versions and unknown member.
-    customers = postgres_warehouse_conn.execute(
+    customers = warehouse_connection_factory().execute(
         """
         SELECT customer_id, last_name, is_current
         FROM gold.dim_customer
@@ -78,7 +78,7 @@ def test_gold_dimensions_and_facts(
     ]
 
     # Date dimension: integer date keys and calendar attributes.
-    dates = postgres_warehouse_conn.execute(
+    dates = warehouse_connection_factory().execute(
         """
         SELECT full_date, date_sk, day_of_week, is_weekend
         FROM gold.dim_date
@@ -93,7 +93,7 @@ def test_gold_dimensions_and_facts(
     ]
 
     # One fact row per order; shipment dates resolve through dim_date.
-    orders = postgres_warehouse_conn.execute(
+    orders = warehouse_connection_factory().execute(
         """
         SELECT
             order_id,
@@ -112,7 +112,7 @@ def test_gold_dimensions_and_facts(
         (1002, "processing", 20260102, "Carrier B", None, None),
     ]
 
-    order_count, distinct_order_count = postgres_warehouse_conn.execute(
+    order_count, distinct_order_count = warehouse_connection_factory().execute(
         """
         SELECT count(*), count(DISTINCT order_id)
         FROM gold.fct_orders
@@ -122,7 +122,7 @@ def test_gold_dimensions_and_facts(
     assert order_count == distinct_order_count == 2
 
     # One fact row per order item, with the expected product and measures.
-    order_items = postgres_warehouse_conn.execute(
+    order_items = warehouse_connection_factory().execute(
         """
         SELECT
             f.order_item_id,
@@ -142,7 +142,7 @@ def test_gold_dimensions_and_facts(
         (502, 1, Decimal("19.50"), 202, 20260102),
     ]
 
-    item_count, distinct_item_count = postgres_warehouse_conn.execute(
+    item_count, distinct_item_count = warehouse_connection_factory().execute(
         """
         SELECT count(*), count(DISTINCT order_item_id)
         FROM gold.fct_order_items
@@ -153,10 +153,10 @@ def test_gold_dimensions_and_facts(
 
 
 def test_fact_order_uses_customer_version_valid_at_order_time(
-    postgres_warehouse_conn,
+    warehouse_connection_factory,
     dbt_profile,
 ):
-    _seed_bronze(postgres_warehouse_conn)
+    _seed_bronze(warehouse_connection_factory())
 
     initial_updated_at = datetime(2026, 2, 1, 12, tzinfo=UTC)
     changed_updated_at = datetime(2026, 2, 3, 12, tzinfo=UTC)
@@ -174,12 +174,12 @@ def test_fact_order_uses_customer_version_valid_at_order_time(
         "updated_at": initial_updated_at.isoformat(),
     }
 
-    with postgres_warehouse_conn.cursor() as cur:
+    with warehouse_connection_factory().cursor() as cur:
         cur.execute(
             "INSERT INTO bronze.customers (payload) VALUES (%s)",
             (Jsonb(initial_customer),),
         )
-    postgres_warehouse_conn.commit()
+    warehouse_connection_factory().commit()
 
     # Capture the first customer version in the snapshot.
     _build_silver(dbt_profile)
@@ -200,7 +200,7 @@ def test_fact_order_uses_customer_version_valid_at_order_time(
         "updated_at": "2026-02-02T12:00:00Z",
     }
 
-    with postgres_warehouse_conn.cursor() as cur:
+    with warehouse_connection_factory().cursor() as cur:
         cur.execute(
             "INSERT INTO bronze.customers (payload) VALUES (%s)",
             (Jsonb(changed_customer),),
@@ -209,7 +209,7 @@ def test_fact_order_uses_customer_version_valid_at_order_time(
             "INSERT INTO bronze.orders (payload) VALUES (%s)",
             (Jsonb(order),),
         )
-    postgres_warehouse_conn.commit()
+    warehouse_connection_factory().commit()
 
     # Refresh the current customer view and process the new order.
     run_dbt(
@@ -223,7 +223,7 @@ def test_fact_order_uses_customer_version_valid_at_order_time(
     _build_gold(dbt_profile)
 
     # The order was placed between the two customer versions.
-    matched_customer = postgres_warehouse_conn.execute(
+    matched_customer = warehouse_connection_factory().execute(
         """
         SELECT d.last_name, d.is_current
         FROM gold.fct_orders AS f

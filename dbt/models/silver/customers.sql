@@ -12,7 +12,7 @@ validated as (
     from bronze as b
     left join {{ source('meta', 'quarantine') }} as q
         on
-            q.source_table = 'customers'
+            q.bronze_table = 'customers'
             and b.ingestion_id = q.ingestion_id
     where q.quarantine_id is null
 ),
