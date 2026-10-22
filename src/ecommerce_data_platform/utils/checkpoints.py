@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ecommerce_data_platform.types import Checkpoint
+from ecommerce_data_platform.models import Checkpoint
 
 
 def checkpoint_to_columns(

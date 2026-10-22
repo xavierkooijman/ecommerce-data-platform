@@ -3,8 +3,14 @@ import uuid
 from datetime import UTC, datetime
 from typing import Literal
 
-from ecommerce_data_platform.storage.base import PipelineRunsStore
-from ecommerce_data_platform.types import ExecutionContext, PipelineRun
+from ecommerce_data_platform.models import (
+    DataSource,
+    ExecutionContext,
+    PipelineRun,
+    PipelineRunStatus,
+    PipelineStage,
+)
+from ecommerce_data_platform.storage.base import PipelineRunStore
 
 logger = logging.getLogger(__name__)
 
@@ -12,9 +18,9 @@ logger = logging.getLogger(__name__)
 class PipelineRunTracker:
     def __init__(
         self,
-        stage: str,
-        store: PipelineRunsStore,
-        source_table: str | None = None,
+        stage: PipelineStage,
+        store: PipelineRunStore,
+        data_source: DataSource,
         execution_context: ExecutionContext | None = None,
     ) -> None:
 
@@ -24,7 +30,7 @@ class PipelineRunTracker:
                 task_id=stage,
             ),
             stage=stage,
-            source_table=source_table,
+            data_source=data_source,
         )
 
         self.store = store
@@ -46,7 +52,7 @@ class PipelineRunTracker:
 
         failed = exc_value is not None
 
-        self.run.status = "failed" if failed else "success"
+        self.run.status = PipelineRunStatus.FAILED if failed else PipelineRunStatus.SUCCESS
         self.run.error_message = str(exc_value) if failed else None
 
         logger.log(
@@ -72,7 +78,8 @@ class PipelineRunTracker:
             "task_id": self.run.execution_context.task_id,
             "try_number": self.run.execution_context.try_number,
             "stage": self.run.stage,
-            "source_table": self.run.source_table,
+            "source_system": self.run.data_source.source_system,
+            "resource": self.run.data_source.resource,
             "rows_extracted": self.run.rows_extracted,
             "rows_loaded": self.run.rows_loaded,
             "rows_inspected": self.run.rows_inspected,
