@@ -3,7 +3,7 @@ import os
 import psycopg
 
 
-def warehouse_connection() -> psycopg.Connection:
+def warehouse_connection_factory() -> psycopg.Connection:
     return psycopg.connect(
         host=os.getenv("WAREHOUSE_DB_HOST", "localhost"),
         port=int(os.getenv("WAREHOUSE_DB_PORT", "5433")),
@@ -14,7 +14,7 @@ def warehouse_connection() -> psycopg.Connection:
     )
 
 
-def source_connection() -> psycopg.Connection:
+def source_connection_factory() -> psycopg.Connection:
     return psycopg.connect(
         host=os.getenv("SOURCE_DB_HOST", "localhost"),
         port=int(os.getenv("SOURCE_DB_PORT", "5432")),
