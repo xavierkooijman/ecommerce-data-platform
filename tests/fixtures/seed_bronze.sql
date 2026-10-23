@@ -61,8 +61,10 @@ WITH inserted AS (
     )
     RETURNING ingestion_id
 )
-INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+INSERT INTO meta.quarantine (source_system, resource, bronze_table, ingestion_id, resource_pk, errors)
 SELECT
+    'bronze',
+    'customers',
     'customers',
     ingestion_id,
     '103',
@@ -121,8 +123,10 @@ WITH inserted AS (
     )
     RETURNING ingestion_id
 )
-INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+INSERT INTO meta.quarantine (source_system, resource, bronze_table, ingestion_id, resource_pk, errors)
 SELECT
+    'bronze',
+    'products',
     'products',
     ingestion_id,
     '203',
@@ -180,8 +184,10 @@ WITH inserted AS (
     )
     RETURNING ingestion_id
 )
-INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+INSERT INTO meta.quarantine (source_system, resource, bronze_table, ingestion_id, resource_pk, errors)
 SELECT
+    'bronze',
+    'orders',
     'orders',
     ingestion_id,
     '1003',
@@ -239,8 +245,10 @@ WITH inserted AS (
     )
     RETURNING ingestion_id
 )
-INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+INSERT INTO meta.quarantine (source_system, resource, bronze_table, ingestion_id, resource_pk, errors)
 SELECT
+    'bronze',
+    'order_items',
     'order_items',
     ingestion_id,
     '503',
@@ -298,8 +306,10 @@ WITH inserted AS (
     )
     RETURNING ingestion_id
 )
-INSERT INTO meta.quarantine (source_table, ingestion_id, source_pk, errors)
+INSERT INTO meta.quarantine (source_system, resource, bronze_table, ingestion_id, resource_pk, errors)
 SELECT
+    'bronze',
+    'shipments',
     'shipments',
     ingestion_id,
     '703',

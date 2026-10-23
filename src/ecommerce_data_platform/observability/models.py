@@ -1,21 +1,21 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from ecommerce_data_platform.storage.base import PipelineRunsStore
-from ecommerce_data_platform.types import SourceTable
+from ecommerce_data_platform.models import DataSource
+from ecommerce_data_platform.storage.base import PipelineRunStore
 
 
 @dataclass(frozen=True)
 class TriggeredCheck:
     name: str
-    source_table: SourceTable
+    data_source: DataSource
     observed_value: int | float
     threshold: int | float
 
 @dataclass(frozen=True)
 class CheckConfig[T : int | float]:
     check: Callable[
-        [PipelineRunsStore, SourceTable, T],
+        [PipelineRunStore, DataSource, T],
         TriggeredCheck | None,
     ]
     threshold: T
@@ -25,7 +25,8 @@ class CheckThresholdExceeded(Exception):
         self.checks = checks
 
         details = "; ".join(
-            f"{check.name} for {check.source_table}: "
+            f"{check.name} for {check.data_source.resource} from "
+            f"{check.data_source.source_system}: "
             f"observed={check.observed_value}, "
             f"threshold={check.threshold}"
             for check in checks

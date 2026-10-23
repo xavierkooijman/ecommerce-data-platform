@@ -6,14 +6,14 @@ from helpers import run_dbt
 
 
 def test_silver_models_select_latest_records_and_exclude_quarantined(
-    postgres_warehouse_conn,
+    warehouse_connection_factory,
     dbt_profile,
 ):
     BRONZE_SEED_FILE = PROJECT_ROOT / "tests" / "fixtures" / "seed_bronze.sql"
-    with postgres_warehouse_conn.cursor() as cur:
+    with warehouse_connection_factory().cursor() as cur:
         cur.execute(BRONZE_SEED_FILE.read_text(), prepare=False)
 
-    postgres_warehouse_conn.commit()
+    warehouse_connection_factory().commit()
 
     run_dbt(
         dbt_profile,
@@ -28,7 +28,7 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     )
 
     # Customers: latest version retained; quarantined customer excluded.
-    customers = postgres_warehouse_conn.execute(
+    customers = warehouse_connection_factory().execute(
         """
         SELECT customer_id, email, city, signup_date
         FROM silver.customers
@@ -42,7 +42,7 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     ]
 
     # Products: latest price retained; quarantined product excluded.
-    products = postgres_warehouse_conn.execute(
+    products = warehouse_connection_factory().execute(
         """
         SELECT product_id, sku, product_name, price
         FROM silver.products
@@ -56,7 +56,7 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     ]
 
     # Orders: latest status retained; quarantined order excluded.
-    orders = postgres_warehouse_conn.execute(
+    orders = warehouse_connection_factory().execute(
         """
         SELECT order_id, customer_id, status, payment_method
         FROM silver.orders
@@ -70,7 +70,7 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     ]
 
     # Order items: latest quantity and unit price retained.
-    order_items = postgres_warehouse_conn.execute(
+    order_items = warehouse_connection_factory().execute(
         """
         SELECT order_item_id, order_id, product_id, quantity, unit_price
         FROM silver.order_items
@@ -84,7 +84,7 @@ def test_silver_models_select_latest_records_and_exclude_quarantined(
     ]
 
     # Shipments: latest delivery state retained; null timestamps preserved.
-    shipments = postgres_warehouse_conn.execute(
+    shipments = warehouse_connection_factory().execute(
         """
         SELECT shipment_id, carrier, delivered_at IS NULL
         FROM silver.shipments

@@ -5,10 +5,10 @@ from psycopg.types.json import Jsonb
 
 
 def test_customer_snapshot_history(
-    postgres_warehouse_conn,
+    warehouse_connection_factory,
     dbt_profile,
 ):
-    conn = postgres_warehouse_conn
+    conn = warehouse_connection_factory()
 
     initial_updated_at = datetime(2026, 1, 2, 12, tzinfo=UTC)
     changed_updated_at = datetime(2026, 1, 3, 12, tzinfo=UTC)

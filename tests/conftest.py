@@ -5,6 +5,8 @@ import pytest
 import yaml
 from testcontainers.community.postgres import PostgresContainer
 
+from ecommerce_data_platform.models import BronzeTable, DataSource, Resource, SourceSystem
+
 PROJECT_ROOT = Path(__file__).parents[1]
 SCHEMA_FILE = PROJECT_ROOT / "sql" / "schema.sql"
 SOURCE_SCHEMA_FILE = PROJECT_ROOT / "init-db" / "source_schema.sql"
@@ -21,56 +23,46 @@ def postgres_warehouse_container():
         yield container
 
 @pytest.fixture
-def postgres_source_conn(postgres_source_container):
-    conn = psycopg.connect(
-        host=postgres_source_container.get_container_host_ip(),
-        port=postgres_source_container.get_exposed_port(5432),
-        user=postgres_source_container.username,
-        password=postgres_source_container.password,
-        dbname=postgres_source_container.dbname,
-    )
-    with conn.cursor() as cur:
-        cur.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
-        cur.execute(SOURCE_SCHEMA_FILE.read_text())
-        cur.execute(SOURCE_SEED_FILE.read_text(), prepare=False)
-    conn.commit()
-    yield conn
-    conn.close()
+def source_connection_factory(postgres_source_container):
+    def connection_factory():
+        return psycopg.connect(
+            host=postgres_source_container.get_container_host_ip(),
+            port=postgres_source_container.get_exposed_port(5432),
+            user=postgres_source_container.username,
+            password=postgres_source_container.password,
+            dbname=postgres_source_container.dbname,
+            autocommit=True,
+        )
+
+    with connection_factory() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+            cur.execute(SOURCE_SCHEMA_FILE.read_text())
+            cur.execute(SOURCE_SEED_FILE.read_text(), prepare=False)
+
+    return connection_factory
 
 @pytest.fixture
-def patch_source_connection(monkeypatch, postgres_source_conn):
-    monkeypatch.setattr(
-        "ecommerce_data_platform.extract.postgres.source_connection",
-        lambda: postgres_source_conn,
-    )
+def warehouse_connection_factory(postgres_warehouse_container):
+    def connection_factory():
+        return psycopg.connect(
+            host=postgres_warehouse_container.get_container_host_ip(),
+            port=postgres_warehouse_container.get_exposed_port(5432),
+            user=postgres_warehouse_container.username,
+            password=postgres_warehouse_container.password,
+            dbname=postgres_warehouse_container.dbname,
+            autocommit=True,
+        )
 
-@pytest.fixture
-def postgres_warehouse_conn(postgres_warehouse_container):
-    conn = psycopg.connect(
-        host=postgres_warehouse_container.get_container_host_ip(),
-        port=postgres_warehouse_container.get_exposed_port(5432),
-        user=postgres_warehouse_container.username,
-        password=postgres_warehouse_container.password,
-        dbname=postgres_warehouse_container.dbname,
-    )
+    with connection_factory() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DROP SCHEMA IF EXISTS bronze CASCADE;")
+            cur.execute("DROP SCHEMA IF EXISTS meta CASCADE;")
+            cur.execute("DROP SCHEMA IF EXISTS silver CASCADE;")
+            cur.execute("DROP SCHEMA IF EXISTS gold CASCADE;")
+            cur.execute(SCHEMA_FILE.read_text())
 
-    with conn.cursor() as cur:
-        cur.execute("DROP SCHEMA IF EXISTS bronze CASCADE;")
-        cur.execute("DROP SCHEMA IF EXISTS meta CASCADE;")
-        cur.execute("DROP SCHEMA IF EXISTS silver CASCADE;")
-        cur.execute("DROP SCHEMA IF EXISTS gold CASCADE;")
-        cur.execute(SCHEMA_FILE.read_text())
-    conn.commit()
-
-    yield conn
-    conn.close()
-
-@pytest.fixture
-def patch_warehouse_connection(monkeypatch, postgres_warehouse_conn):
-    monkeypatch.setattr(
-        "ecommerce_data_platform.storage.postgres.warehouse_connection",
-        lambda: postgres_warehouse_conn,
-    )
+    return connection_factory
 
 @pytest.fixture(scope="session")
 def dbt_profile(postgres_warehouse_container, tmp_path_factory):
@@ -100,3 +92,15 @@ def dbt_profile(postgres_warehouse_container, tmp_path_factory):
     )
 
     return profiles_dir
+
+
+@pytest.fixture
+def data_source():
+    return DataSource(
+        source_system=SourceSystem.ECOMMERCE_DB,
+        resource=Resource.CUSTOMERS,
+    )
+
+@pytest.fixture
+def bronze_table():
+    return BronzeTable.CUSTOMERS

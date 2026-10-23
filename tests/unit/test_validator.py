@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from ecommerce_data_platform.records import BronzeRecord
+from ecommerce_data_platform.models import BronzeRecord
 from ecommerce_data_platform.validation.models import Customer
 from ecommerce_data_platform.validation.validator import validate
 
@@ -44,7 +44,7 @@ def test_validate_returns_rejected_record_for_invalid_records():
     assert len(rejected) == 1
 
     assert rejected[0].ingestion_id == 42
-    assert rejected[0].source_pk == "1"
+    assert rejected[0].resource_pk == "1"
     assert len(rejected[0].errors) > 0
 
 def test_validate_sets_source_pk_to_none_when_id_missing():
@@ -60,4 +60,4 @@ def test_validate_sets_source_pk_to_none_when_id_missing():
     rejected = validate(Customer, records)
 
     assert len(rejected) == 1
-    assert rejected[0].source_pk is None
+    assert rejected[0].resource_pk is None

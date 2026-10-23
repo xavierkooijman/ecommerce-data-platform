@@ -1,29 +1,29 @@
+from ecommerce_data_platform.models import DataSource
 from ecommerce_data_platform.observability.models import TriggeredCheck
-from ecommerce_data_platform.storage.base import PipelineRunsStore
-from ecommerce_data_platform.types import SourceTable
+from ecommerce_data_platform.storage.base import PipelineRunStore
 
 
 def check_consecutive_zero_row_runs(
-    store: PipelineRunsStore, source_table: SourceTable, threshold: int
+    store: PipelineRunStore, data_source: DataSource, threshold: int
 ) -> TriggeredCheck | None:
     consecutive_zero_row_runs = store.get_consecutive_zero_row_runs(
-        source_table=source_table
+        data_source=data_source
     )
     if consecutive_zero_row_runs >= threshold:
         return TriggeredCheck(
             name="consecutive_zero_row_runs",
-            source_table=source_table,
+            data_source=data_source,
             observed_value=consecutive_zero_row_runs,
             threshold=threshold,
         )
     return None
 
 def check_rejection_rate_percentage(
-    store: PipelineRunsStore, source_table: SourceTable, threshold: float
+    store: PipelineRunStore, data_source: DataSource, threshold: float
 ) -> TriggeredCheck | None:
     rows_inspected, rows_rejected = (
         store.get_rows_inspected_and_rejected_from_latest_run(
-        source_table=source_table
+        data_source=data_source
         )
     )
     if rows_inspected == 0:
@@ -34,7 +34,7 @@ def check_rejection_rate_percentage(
     if rejection_rate >= threshold:
         return TriggeredCheck(
             name="rejection_rate_percentage",
-            source_table=source_table,
+            data_source=data_source,
             observed_value=rejection_rate,
             threshold=threshold,
         )

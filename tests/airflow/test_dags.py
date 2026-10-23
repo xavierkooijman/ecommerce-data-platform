@@ -94,27 +94,27 @@ def test_dag_structure(
         (
             "ingest_customers",
             "check_customer_alerts",
-            "customers_ready",
+            "ecommerce_db.customers.ready",
         ),
         (
             "ingest_order_items",
             "check_order_item_alerts",
-            "order_items_ready",
+            "ecommerce_db.order_items.ready",
         ),
         (
             "ingest_orders",
             "check_order_alerts",
-            "orders_ready",
+            "ecommerce_db.orders.ready",
         ),
         (
             "ingest_products",
             "check_product_alerts",
-            "products_ready",
+            "ecommerce_db.products.ready",
         ),
         (
             "ingest_shipments",
             "check_shipment_alerts",
-            "shipments_ready",
+            "ecommerce_db.shipments.ready",
         ),
     ],
 )
