@@ -72,6 +72,9 @@ def test_dags_load(dag_bag: DagBag) -> None:
         ("transform_dimensions", {"build_dimensions"}, {}),
         ("transform_orders", {"build_orders"}, {}),
         ("transform_shipments", {"build_shipments"}, {}),
+        ("global_checks_frequent", {"run_global_checks_frequent"}, {}),
+        ("global_checks_daily", {"run_global_checks_daily"}, {}),
+        ("global_checks_hourly", {"run_global_checks_hourly"}, {}),
     ],
 )
 def test_dag_structure(
