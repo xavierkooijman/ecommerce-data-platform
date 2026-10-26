@@ -217,7 +217,7 @@ class PostgresPipelineRunStore:
                 status,
                 started_at
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         with self._connection_factory() as conn:
             with conn.cursor() as cur:
@@ -324,6 +324,24 @@ class PostgresPipelineRunStore:
                     (data_source.source_system, data_source.resource, PipelineStage.VALIDATION),
                 )
                 return cur.fetchone() or (0, 0)
+
+    def get_stuck_runs_count(self, max_age_minutes: int) -> int:
+        with self._connection_factory() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM meta.pipeline_runs
+                    WHERE 
+                        finished_at IS NULL
+                        AND started_at < NOW() - INTERVAL '%s minutes' 
+                    """,
+                    (max_age_minutes,)
+                )
+
+                row = cur.fetchone()
+                return row[0] if row else 0
+
 
 
         

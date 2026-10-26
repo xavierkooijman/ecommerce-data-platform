@@ -72,7 +72,7 @@ class ExecutionContext:
 
 
 class PipelineRunStatus(StrEnum):
-    RUNNING = "runnig"
+    RUNNING = "running"
     SUCCESS = "success"
     FAILED = "failed"
 

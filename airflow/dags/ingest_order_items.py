@@ -13,8 +13,8 @@ from ecommerce_data_platform.models import (
     Resource,
     SourceSystem,
 )
-from ecommerce_data_platform.observability.checks_runner import run_checks
 from ecommerce_data_platform.observability.pipeline_run_tracker import PipelineRunTracker
+from ecommerce_data_platform.observability.source_checks_runner import run_source_checks
 from ecommerce_data_platform.pipeline.ingestion import run_incremental_ingestion
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
 from ecommerce_data_platform.storage.postgres import (
@@ -72,7 +72,7 @@ def order_items_dag():
 
     @task(outlets=[ECOMMERCE_DB_ORDER_ITEMS_READY])
     def check_order_item_alerts():
-        run_checks(
+        run_source_checks(
             data_source=DATA_SOURCE,
             store=PostgresPipelineRunStore(warehouse_connection_factory),
         )
