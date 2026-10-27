@@ -2,10 +2,10 @@ from unittest.mock import Mock
 
 from ecommerce_data_platform.observability.checks import (
     check_consecutive_zero_row_runs,
-    check_rejection_rate_percentage,
-    check_open_quarantine_count,
     check_oldest_open_quarantine_age_hours,
-    check_stuck_runs
+    check_open_quarantine_count,
+    check_rejection_rate_percentage,
+    check_stuck_runs,
 )
 from ecommerce_data_platform.observability.models import TriggeredCheck
 

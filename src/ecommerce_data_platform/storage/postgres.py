@@ -182,9 +182,9 @@ class PostgresQuarantineStore:
                 FROM meta.quarantine
                 WHERE status = 'open'
                 """
-            )
-            row = cur.fetchone()
-            return row[0] if row else 0
+                )
+                row = cur.fetchone()
+        return row[0] if row else 0
 
     def get_oldest_open_quarantine_age_hours(self) -> int | float:
 
@@ -192,13 +192,16 @@ class PostgresQuarantineStore:
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    SELECT EXTRACT(EPOCH FROM (NOW() - MIN(quarantined_at))) / 3600.0
+                    SELECT COALESCE( 
+                        EXTRACT(EPOCH FROM (NOW() - MIN(quarantined_at))) / 3600.0,
+                        0
+                    )
                     FROM meta.quarantine
                     WHERE status = 'open'
                     """
                 )
                 row = cur.fetchone()
-                return row[0] if row else 0
+        return row[0] if row else 0
 
 class PostgresPipelineRunStore:
     def __init__(self, connection_factory: PostgresConnectionFactory) -> None:
@@ -302,7 +305,7 @@ class PostgresPipelineRunStore:
                     (data_source.source_system, data_source.resource, PipelineStage.INGESTION),
                 )
                 row = cur.fetchone()
-                return row[0] if row else 0
+        return row[0] if row else 0
 
     def get_rows_inspected_and_rejected_from_latest_run(
         self, 
@@ -334,7 +337,7 @@ class PostgresPipelineRunStore:
                     FROM meta.pipeline_runs
                     WHERE 
                         finished_at IS NULL
-                        AND started_at < NOW() - INTERVAL '%s minutes' 
+                        AND started_at < NOW() - (%s * INTERVAL '1 minute') 
                     """,
                     (max_age_minutes,)
                 )
