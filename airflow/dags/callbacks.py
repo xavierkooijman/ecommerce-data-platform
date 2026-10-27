@@ -20,7 +20,7 @@ def webhook_task_failure_callback(context: dict) -> None:
     exception = context.get("exception")
 
     message = (
-        ":red_circle: *Airflow task failed*\n"
+        "*Airflow task failed*\n"
         f"*DAG:* {ti.dag_id if ti else 'unknown'}\n"
         f"*Task:* {ti.task_id if ti else 'unknown'}\n"
         f"*Run:* {context.get('run_id', 'unknown')}\n"

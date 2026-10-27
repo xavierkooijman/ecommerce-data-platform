@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from ecommerce_data_platform.observability import checks_runner
+from ecommerce_data_platform.observability import source_checks_runner
 from ecommerce_data_platform.observability.models import (
     CheckThresholdExceeded,
     TriggeredCheck,
@@ -14,12 +14,12 @@ def test_run_checks_completes_when_no_checks_trigger(monkeypatch, data_source):
     store = Mock()
 
     monkeypatch.setattr(
-        checks_runner,
-        "CHECK_CONFIG",
+        source_checks_runner,
+        "SOURCE_CHECKS_CONFIG",
         {data_source: [Mock(check=check, threshold=3)]},
     )
 
-    checks_runner.run_checks(data_source, store)
+    source_checks_runner.run_source_checks(data_source, store)
 
     check.assert_called_once_with(store, data_source, 3)
 
@@ -35,12 +35,12 @@ def test_run_checks_raises_when_a_check_triggers(monkeypatch, data_source):
     store = Mock()
 
     monkeypatch.setattr(
-        checks_runner,
-        "CHECK_CONFIG",
+        source_checks_runner,
+        "SOURCE_CHECKS_CONFIG",
         {data_source: [Mock(check=check, threshold=3)]},
     )
 
     with pytest.raises(CheckThresholdExceeded):
-        checks_runner.run_checks(data_source, store)
+        source_checks_runner.run_source_checks(data_source, store)
 
     check.assert_called_once_with(store, data_source, 3)

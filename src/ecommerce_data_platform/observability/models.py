@@ -8,12 +8,12 @@ from ecommerce_data_platform.storage.base import PipelineRunStore
 @dataclass(frozen=True)
 class TriggeredCheck:
     name: str
-    data_source: DataSource
     observed_value: int | float
     threshold: int | float
+    data_source: DataSource | None = None
 
 @dataclass(frozen=True)
-class CheckConfig[T : int | float]:
+class SourceCheckConfig[T : int | float]:
     check: Callable[
         [PipelineRunStore, DataSource, T],
         TriggeredCheck | None,
@@ -21,15 +21,28 @@ class CheckConfig[T : int | float]:
     threshold: T
 
 class CheckThresholdExceeded(Exception):
-    def __init__(self, checks: list[TriggeredCheck]) -> None:
-        self.checks = checks
+    def __init__(self, triggered_checks: list[TriggeredCheck]) -> None:
+        self.triggered_checks = triggered_checks
 
         details = "; ".join(
-            f"{check.name} for {check.data_source.resource} from "
-            f"{check.data_source.source_system}: "
-            f"observed={check.observed_value}, "
-            f"threshold={check.threshold}"
-            for check in checks
+            self._format_check(check)
+            for check in triggered_checks
         )
 
         super().__init__(f"Pipeline checks triggered: {details}")
+
+    @staticmethod
+    def _format_check(check: TriggeredCheck) -> str:
+        source = check.data_source
+        source_details = ""
+
+        if source is not None:
+            source_details = (
+                f" for {source.resource} from {source.source_system}"
+            )
+
+        return (
+            f"{check.name}{source_details}: "
+            f"observed={check.observed_value}, "
+            f"threshold={check.threshold}"
+        )
