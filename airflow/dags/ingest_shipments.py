@@ -24,6 +24,7 @@ from ecommerce_data_platform.storage.postgres import (
     PostgresQuarantineStore,
 )
 from ecommerce_data_platform.utils.db import source_connection_factory, warehouse_connection_factory
+from ecommerce_data_platform.validation.models import Shipment
 
 DATA_SOURCE = DataSource(SourceSystem.ECOMMERCE_DB, Resource.SHIPMENTS)
 BRONZE_TABLE = BronzeTable.SHIPMENTS
@@ -59,6 +60,7 @@ def shipments_dag():
         run_bronze_validation(
             data_source=DATA_SOURCE,
             bronze_table=BRONZE_TABLE,
+            model=Shipment,
             bronze_store=PostgresBronzeStore(warehouse_connection_factory),
             checkpoint_store=PostgresCheckpointStore(warehouse_connection_factory),
             quarantine_store=PostgresQuarantineStore(warehouse_connection_factory),

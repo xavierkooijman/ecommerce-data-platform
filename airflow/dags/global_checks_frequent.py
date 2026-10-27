@@ -6,6 +6,8 @@ from callbacks import webhook_task_failure_callback
 
 from ecommerce_data_platform.observability.checks import check_stuck_runs
 from ecommerce_data_platform.observability.global_checks_runner import run_global_checks
+from ecommerce_data_platform.storage.postgres import PostgresPipelineRunStore
+from ecommerce_data_platform.utils.db import warehouse_connection_factory
 
 
 @dag(
@@ -20,7 +22,7 @@ def global_checks_frequent_dag():
     @task()
     def run_global_checks_frequent():
         checks = [
-            partial(check_stuck_runs(15))
+            partial(check_stuck_runs, PostgresPipelineRunStore(warehouse_connection_factory), 15)
         ]
         run_global_checks(checks)
 

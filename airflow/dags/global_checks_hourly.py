@@ -6,6 +6,8 @@ from callbacks import webhook_task_failure_callback
 
 from ecommerce_data_platform.observability.checks import check_open_quarantine_count
 from ecommerce_data_platform.observability.global_checks_runner import run_global_checks
+from ecommerce_data_platform.storage.postgres import PostgresQuarantineStore
+from ecommerce_data_platform.utils.db import warehouse_connection_factory
 
 
 @dag(
@@ -20,7 +22,11 @@ def global_checks_hourly_dag():
     @task()
     def run_global_checks_hourly():
         checks = [
-            partial(check_open_quarantine_count(100))
+            partial(
+                check_open_quarantine_count,
+                PostgresQuarantineStore(warehouse_connection_factory),
+                100,
+            )
         ]
         run_global_checks(checks)
 
