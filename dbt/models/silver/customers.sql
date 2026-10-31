@@ -20,7 +20,7 @@ validated as (
 typed as (
     select
         ingestion_id as bronze_ingestion_id,
-        (payload ->> 'id')::int as customer_id,
+        (payload ->> 'id')::integer as customer_id,
         payload ->> 'email' as email,
         payload ->> 'first_name' as first_name,
         payload ->> 'last_name' as last_name,

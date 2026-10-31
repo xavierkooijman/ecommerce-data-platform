@@ -1,6 +1,6 @@
 models:
-  - name: fct_order_items
-    description: Fact table for order items
+  - name: fct_item_sales
+    description: Fact table for order item sales
     columns:
       - name: order_item_sk
         description: Surrogate key for the order item
@@ -12,6 +12,11 @@ models:
         description: Source system order item identifier
         tests:
           - unique
+          - not_null
+      
+      - name: order_id
+        description: Source system order identifier
+        tests:
           - not_null
 
       - name: customer_sk

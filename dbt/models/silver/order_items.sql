@@ -30,10 +30,10 @@ validated as (
 typed as (
     select
         ingestion_id as bronze_ingestion_id,
-        (payload ->> 'id')::int as order_item_id,
-        (payload ->> 'order_id')::int as order_id,
-        (payload ->> 'product_id')::int as product_id,
-        (payload ->> 'quantity')::int as quantity,
+        (payload ->> 'id')::integer as order_item_id,
+        (payload ->> 'order_id')::integer as order_id,
+        (payload ->> 'product_id')::integer as product_id,
+        (payload ->> 'quantity')::integer as quantity,
         (payload ->> 'unit_price')::numeric(10, 2) as unit_price,
         (payload ->> 'created_at')::timestamptz as created_at,
         (payload ->> 'updated_at')::timestamptz as updated_at

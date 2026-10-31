@@ -102,7 +102,7 @@ def test_gold_dimensions_and_facts(
             carrier,
             shipped_at_sk,
             delivered_at_sk
-        FROM gold.fct_orders
+        FROM gold.fct_order_fulfillment
         ORDER BY order_id
         """
     ).fetchall()
@@ -115,7 +115,7 @@ def test_gold_dimensions_and_facts(
     order_count, distinct_order_count = warehouse_connection_factory().execute(
         """
         SELECT count(*), count(DISTINCT order_id)
-        FROM gold.fct_orders
+        FROM gold.fct_order_fulfillment
         """
     ).fetchone()
 
@@ -130,7 +130,7 @@ def test_gold_dimensions_and_facts(
             f.unit_price,
             p.product_id,
             f.order_date_sk
-        FROM gold.fct_order_items AS f
+        FROM gold.fct_item_sales AS f
         JOIN gold.dim_product AS p
             ON f.product_sk = p.product_sk
         ORDER BY f.order_item_id
@@ -145,7 +145,7 @@ def test_gold_dimensions_and_facts(
     item_count, distinct_item_count = warehouse_connection_factory().execute(
         """
         SELECT count(*), count(DISTINCT order_item_id)
-        FROM gold.fct_order_items
+        FROM gold.fct_item_sales
         """
     ).fetchone()
 
@@ -226,7 +226,7 @@ def test_fact_order_uses_customer_version_valid_at_order_time(
     matched_customer = warehouse_connection_factory().execute(
         """
         SELECT d.last_name, d.is_current
-        FROM gold.fct_orders AS f
+        FROM gold.fct_order_fulfillment AS f
         JOIN gold.dim_customer AS d
             ON f.customer_sk = d.customer_sk
         WHERE f.order_id = 1099

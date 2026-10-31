@@ -21,7 +21,7 @@ def transform_orders():
     def build_orders():
         return (
             "dbt build "
-            "--select orders order_items fct_orders fct_order_items"
+            "--select orders order_items fct_order_fulfillment fct_item_sales"
         )
 
     build_orders()

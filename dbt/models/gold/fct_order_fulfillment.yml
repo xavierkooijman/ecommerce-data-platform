@@ -1,6 +1,6 @@
 models:
-  - name: fct_orders
-    description: Fact table for orders
+  - name: fct_order_fulfillment
+    description: Fact table for order fulfillment
     columns:
       - name: order_sk
         description: Surrogate key for the order

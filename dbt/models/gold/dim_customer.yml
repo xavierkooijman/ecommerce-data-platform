@@ -29,6 +29,9 @@ models:
       - name: city
         description: "Customer's city."
 
+      - name: is_active
+        description: "Whether a customer is active or not"
+
       - name: signup_date
         description: "Date when the customer signed up."
 
