@@ -25,7 +25,7 @@ class PostgresIncrementalExtractor:
                     cur.execute(query)
                 else:
                     query = sql.SQL(
-                        "SELECT * FROM {} WHERE {} > %(watermark)s"
+                        "SELECT * FROM {} WHERE {} >= %(watermark)s"
                     ).format(
                         sql.Identifier(resource),
                         sql.Identifier(watermark_column),

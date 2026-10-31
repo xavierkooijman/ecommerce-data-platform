@@ -45,9 +45,8 @@ The four models are:
 
 - Silver processes newly ingested Bronze records instead of scanning the entire Bronze history on every incremental run.
 - Quarantined records are excluded from downstream Silver processing.
-- Multiple incoming records for the same entity are reduced to one candidate before the merge.
 - Older source states cannot overwrite newer Silver states, even if they are ingested later.
-- The implementation uses standard SQL transformations and dbt's built-in merge strategy without requiring a custom incremental strategy.
+- The implementation uses dbt's built-in merge strategy without requiring a custom incremental strategy.
 - The models retain the `bronze_ingestion_id` associated with the selected source state, allowing subsequent runs to identify the ingestion boundary.
 
 **Negative**

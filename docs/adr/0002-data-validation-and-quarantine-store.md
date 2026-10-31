@@ -12,7 +12,7 @@ This means that invalid records from the source are also persisted to the landin
 
 ## Decision
 
-To address this, we will implement a validation step separate from ingestion that checks the records against a defined schema before they are processed in the Silver layer. References to invalid records will be stored in a separate quarantine store. The Silver layer will only process valid records.
+A validation step separate from ingestion checks the records against a defined schema before they are processed in the Silver layer. References to invalid records will be stored in a separate quarantine store. The Silver layer will only process valid records.
 
 For each validation run:
 
@@ -21,7 +21,6 @@ For each validation run:
 3. Validate the JSONB payloads against the defined validation rules.
 4. Write references to invalid records plus context to the quarantine store.
 5. Update the validation checkpoint to the highest ingestion_id processed by the run.
-6. Commit the quarantine records and checkpoint update as one transaction.
 
 ![Validation and Quarantine Store Flow](../images/data-validation-and-quarantine-flow.svg)
 
