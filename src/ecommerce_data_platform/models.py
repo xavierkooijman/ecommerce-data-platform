@@ -6,6 +6,14 @@ from typing import Any
 
 import psycopg
 
+from ecommerce_data_platform.validation.models import (
+    Customer,
+    Order,
+    OrderItem,
+    Product,
+    Shipment,
+)
+
 type Checkpoint = int | datetime
 
 type PostgresConnectionFactory = Callable[[], psycopg.Connection]
@@ -38,8 +46,23 @@ class BronzeTable(StrEnum):
     ORDERS = "orders"
     ORDER_ITEMS = "order_items"
     SHIPMENTS = "shipments"
-    
 
+DATA_SOURCE_BRONZE_TABLES: dict[DataSource, BronzeTable] = {
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.CUSTOMERS): BronzeTable.CUSTOMERS,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.PRODUCTS): BronzeTable.PRODUCTS,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.ORDERS): BronzeTable.ORDERS,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.ORDER_ITEMS): BronzeTable.ORDER_ITEMS,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.SHIPMENTS): BronzeTable.SHIPMENTS,
+}
+
+DATA_SOURCE_VALIDATION_MODELS = {
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.CUSTOMERS): Customer,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.PRODUCTS): Product,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.ORDERS): Order,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.ORDER_ITEMS): OrderItem,
+    DataSource(SourceSystem.ECOMMERCE_DB, Resource.SHIPMENTS): Shipment,
+}
+    
 class QuarantineStatus(StrEnum):
     OPEN = "open"
     REVALIDATED = "revalidated"
@@ -88,5 +111,6 @@ class PipelineRun:
     rows_loaded: int = 0
     rows_inspected: int = 0
     rows_rejected: int = 0
-    watermark: datetime | None = None
+    checkpoint_ts: datetime | None = None
+    checkpoint_num: int | None = None
     error_message: str | None = None

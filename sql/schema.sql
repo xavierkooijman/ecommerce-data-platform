@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS meta.quarantine (
 
 CREATE TABLE IF NOT EXISTS meta.pipeline_runs (
     run_id TEXT NOT NULL,
-    dag_id TEXT NOT NULL,
+    dag_id TEXT,
     task_id TEXT NOT NULL,
     try_number INTEGER NOT NULL DEFAULT 1,
     stage TEXT NOT NULL,
@@ -76,7 +76,8 @@ CREATE TABLE IF NOT EXISTS meta.pipeline_runs (
     rows_loaded INTEGER,
     rows_inspected INTEGER,
     rows_rejected INTEGER,
-    watermark TIMESTAMPTZ,
+    checkpoint_ts TIMESTAMPTZ,
+    checkpoint_num BIGINT,
     error_message TEXT,
     PRIMARY KEY (run_id, task_id, try_number)
 );

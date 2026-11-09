@@ -41,7 +41,9 @@ See [`seed/generate_seed_data.py`](seed/generate_seed_data.py).
 - [x] CI workflow on push and pull request: lint (`ruff`), type check (`mypy`), tests (`pytest`)
 - [x] Pydantic validation and record quarantine store
 - [x] dbt: silver models, `dim_customers`, `dim_products`, `dim_date`, gold-layer facts
-- [ ] Airflow orchestration
+- [x] Airflow orchestration
+- [x] Quarantine and pipeline runs monitoring
+- [x] Alerting on pipeline failures via webhook
 
 ## Technology stack
  
@@ -52,7 +54,7 @@ See [`seed/generate_seed_data.py`](seed/generate_seed_data.py).
 | Testing | `pytest`, `testcontainers` |
 | Linting / typing | `ruff`, `mypy`, `sqlfluff` |
 | Transformation | dbt |
-| Orchestration (planned) | Apache Airflow |
+| Orchestration | Apache Airflow |
 | Containerization | Docker Compose |
 
 
@@ -61,14 +63,20 @@ See [`seed/generate_seed_data.py`](seed/generate_seed_data.py).
 ```bash
 uv run pytest -v
 ```
- 
-Coverage includes: incremental extraction (with/without a watermark, future-watermark edge case), checkpoint persistence, and crash-safety of the load+checkpoint transaction against a real Postgres instance via `testcontainers`.
+
+### Airflow tests
+```bash
+docker build -t airflow-tests --target test .
+docker run --rm airflow-tests
+```
+
+The tests cover data models and validation, checkpoint handling, ingestion and incremental extraction, PostgreSQL storage, quarantine management, pipeline tracking and observability checks, Airflow DAG loading and structure, and dbt transformations including Silver models, Gold dimensions and facts, and customer snapshots.
 
 ## Business Context
 
 The business requirements and needs that drive architectural decisions are documented in [`docs/business-context.md`](docs/business-context.md).
 
-## Engineering decisions
+## Architectural decisions
 
 Architectural Decision Records are stored in [`docs/adr/`](docs/adr/).
 

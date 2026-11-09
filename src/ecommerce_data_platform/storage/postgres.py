@@ -248,7 +248,8 @@ class PostgresPipelineRunStore:
                 rows_loaded = %s,
                 rows_inspected = %s,
                 rows_rejected = %s,
-                watermark = %s,
+                checkpoint_ts = %s,
+                checkpoint_num = %s,
                 error_message = %s
             WHERE run_id = %s AND task_id = %s AND try_number = %s
         """
@@ -263,7 +264,8 @@ class PostgresPipelineRunStore:
                     run.rows_loaded,
                     run.rows_inspected,
                     run.rows_rejected,
-                    run.watermark,
+                    run.checkpoint_ts,
+                    run.checkpoint_num,
                     run.error_message,
                     run.execution_context.run_id,
                     run.execution_context.task_id,

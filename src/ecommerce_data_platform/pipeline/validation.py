@@ -1,6 +1,10 @@
-from pydantic import BaseModel
 
-from ecommerce_data_platform.models import BronzeTable, DataSource, PipelineStage
+from ecommerce_data_platform.models import (
+    DATA_SOURCE_BRONZE_TABLES,
+    DATA_SOURCE_VALIDATION_MODELS,
+    DataSource,
+    PipelineStage,
+)
 from ecommerce_data_platform.observability.pipeline_run_tracker import PipelineRunTracker
 from ecommerce_data_platform.storage.base import (
     BronzeStore,
@@ -12,14 +16,14 @@ from ecommerce_data_platform.validation.validator import validate
 
 def run_bronze_validation(
     data_source: DataSource,
-    bronze_table: BronzeTable, 
-    model: type[BaseModel],
     bronze_store: BronzeStore,
     checkpoint_store: CheckpointStore,
     quarantine_store: QuarantineStore,
     run_tracker: PipelineRunTracker
 ) -> None:
     with run_tracker as run:
+        bronze_table = DATA_SOURCE_BRONZE_TABLES[data_source]
+        model = DATA_SOURCE_VALIDATION_MODELS[data_source]
         checkpoint = checkpoint_store.get(PipelineStage.VALIDATION, data_source)
 
         if checkpoint is not None and not isinstance(checkpoint, int):
@@ -28,6 +32,7 @@ def run_bronze_validation(
             )  
 
         last_id = checkpoint
+        run.checkpoint_num = last_id
 
         records = bronze_store.read(bronze_table, last_id)
         run.rows_inspected = len(records)
@@ -41,3 +46,4 @@ def run_bronze_validation(
         quarantine_store.persist(data_source, bronze_table, rejected)
         new_checkpoint = max(record.ingestion_id for record in records)
         checkpoint_store.set(PipelineStage.VALIDATION, data_source, new_checkpoint)
+        run.checkpoint_num = new_checkpoint
