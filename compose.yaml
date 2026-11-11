@@ -66,7 +66,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./sql/source_schema.sql:/docker-entrypoint-initdb.d/source_schema.sql
       - source_data:/var/lib/postgresql
 
   warehouse_db:
@@ -79,7 +79,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./sql:/docker-entrypoint-initdb.d
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - warehouse_data:/var/lib/postgresql
 
   airflow-postgres:
