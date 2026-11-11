@@ -9,7 +9,7 @@ from ecommerce_data_platform.models import BronzeTable, DataSource, Resource, So
 
 PROJECT_ROOT = Path(__file__).parents[1]
 SCHEMA_FILE = PROJECT_ROOT / "sql" / "schema.sql"
-SOURCE_SCHEMA_FILE = PROJECT_ROOT / "init-db" / "source_schema.sql"
+SOURCE_SCHEMA_FILE = PROJECT_ROOT / "sql" / "source_schema.sql"
 SOURCE_SEED_FILE = PROJECT_ROOT / "tests" / "fixtures" / "seed_source.sql"
 
 @pytest.fixture(scope="session")

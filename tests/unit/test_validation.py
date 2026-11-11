@@ -1,14 +1,10 @@
 from unittest.mock import MagicMock, Mock
 
 import pytest
-from pydantic import BaseModel
 
 from ecommerce_data_platform.models import PipelineStage
 from ecommerce_data_platform.pipeline.validation import run_bronze_validation
 
-
-class CustomerModel(BaseModel):
-    id: int
 
 @pytest.fixture
 def setup_validation(monkeypatch):
@@ -54,8 +50,6 @@ def test_validation_quarantines_rejected_records_and_advances_checkpoint(
 
     run_bronze_validation(
         data_source,
-        bronze_table,
-        CustomerModel,
         deps["bronze_store"],
         deps["checkpoint_store"],
         deps["quarantine_store"],
@@ -85,8 +79,6 @@ def test_validation_with_no_records_does_not_advance_checkpoint(
 
     run_bronze_validation(
         data_source,
-        bronze_table,
-        CustomerModel,
         deps["bronze_store"],
         deps["checkpoint_store"],
         deps["quarantine_store"],
@@ -112,8 +104,6 @@ def test_validation_rejects_invalid_checkpoint(
     ):
         run_bronze_validation(
             data_source,
-            bronze_table,
-            CustomerModel,
             deps["bronze_store"],
             deps["checkpoint_store"],
             deps["quarantine_store"],

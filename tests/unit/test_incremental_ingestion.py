@@ -44,7 +44,6 @@ def test_ingestion_persists_records_and_advances_checkpoint(
 
     run_incremental_ingestion(
         data_source,
-        bronze_table,
         deps["extractor"],
         deps["bronze_store"],
         deps["checkpoint_store"],
@@ -68,18 +67,17 @@ def test_ingestion_persists_records_and_advances_checkpoint(
 
     assert deps["run"].rows_extracted == 2
     assert deps["run"].rows_loaded == 2
-    assert deps["run"].watermark == datetime(2026, 1, 3, tzinfo=UTC)
+    assert deps["run"].checkpoint_ts == datetime(2026, 1, 3, tzinfo=UTC)
 
 
 def test_ingestion_with_no_records_does_not_advance_checkpoint(
-    setup_ingestion, data_source, bronze_table
+    setup_ingestion, data_source
 ):
     deps = setup_ingestion
     deps["extractor"].extract.return_value = []
 
     run_incremental_ingestion(
         data_source,
-        bronze_table,
         deps["extractor"],
         deps["bronze_store"],
         deps["checkpoint_store"],
@@ -91,11 +89,11 @@ def test_ingestion_with_no_records_does_not_advance_checkpoint(
 
     assert deps["run"].rows_extracted == 0
     assert deps["run"].rows_loaded == 0
-    assert deps["run"].watermark is None
+    assert deps["run"].checkpoint_ts is None
 
 
 def test_ingestion_rejects_invalid_checkpoint(
-    setup_ingestion, data_source, bronze_table
+    setup_ingestion, data_source
 ):
     deps = setup_ingestion
     deps["checkpoint_store"].get.return_value = "invalid"
@@ -106,7 +104,6 @@ def test_ingestion_rejects_invalid_checkpoint(
     ):
         run_incremental_ingestion(
             data_source,
-            bronze_table,
             deps["extractor"],
             deps["bronze_store"],
             deps["checkpoint_store"],

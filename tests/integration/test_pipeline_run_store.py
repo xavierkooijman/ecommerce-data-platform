@@ -24,7 +24,8 @@ def make_run(
     rows_loaded: int = 10,
     rows_inspected: int = 0,
     rows_rejected: int = 0,
-    watermark: datetime | None = None,
+    checkpoint_ts: datetime | None = None,
+    checkpoint_num: int | None = None,
     error_message: str | None = None,
 ) -> PipelineRun:
     return PipelineRun(
@@ -43,7 +44,8 @@ def make_run(
         rows_loaded=rows_loaded,
         rows_inspected=rows_inspected,
         rows_rejected=rows_rejected,
-        watermark=watermark,
+        checkpoint_ts=checkpoint_ts,
+        checkpoint_num=checkpoint_num,
         error_message=error_message,
     )
 
@@ -110,7 +112,7 @@ def test_finish_updates_pipeline_run(
     store.start(run)
 
     finished_at = datetime.now(UTC)
-    watermark = datetime(2026, 10, 25, tzinfo=UTC)
+    checkpoint_ts = datetime(2026, 10, 25, tzinfo=UTC)
 
     completed_run = make_run(
         run_id=run.execution_context.run_id,
@@ -125,7 +127,7 @@ def test_finish_updates_pipeline_run(
         rows_loaded=18,
         rows_inspected=20,
         rows_rejected=2,
-        watermark=watermark,
+        checkpoint_ts=checkpoint_ts,
         error_message=None,
     )
 
@@ -142,7 +144,7 @@ def test_finish_updates_pipeline_run(
                     rows_loaded,
                     rows_inspected,
                     rows_rejected,
-                    watermark,
+                    checkpoint_ts,
                     error_message
                 FROM meta.pipeline_runs
                 WHERE run_id = %s
@@ -165,7 +167,7 @@ def test_finish_updates_pipeline_run(
         18,
         20,
         2,
-        watermark,
+        checkpoint_ts,
         None,
     )
 
