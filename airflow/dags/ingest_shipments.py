@@ -7,7 +7,6 @@ from helpers import get_execution_context
 
 from ecommerce_data_platform.extract.postgres import PostgresIncrementalExtractor
 from ecommerce_data_platform.models import (
-    BronzeTable,
     DataSource,
     PipelineStage,
     Resource,
@@ -24,11 +23,8 @@ from ecommerce_data_platform.storage.postgres import (
     PostgresQuarantineStore,
 )
 from ecommerce_data_platform.utils.db import source_connection_factory, warehouse_connection_factory
-from ecommerce_data_platform.validation.models import Shipment
 
 DATA_SOURCE = DataSource(SourceSystem.ECOMMERCE_DB, Resource.SHIPMENTS)
-BRONZE_TABLE = BronzeTable.SHIPMENTS
-
 
 @dag(
     dag_id="ingest_shipments",
@@ -43,7 +39,6 @@ def shipments_dag():
     def ingest_shipments():
         run_incremental_ingestion(
             data_source=DATA_SOURCE,
-            bronze_table=BRONZE_TABLE,
             extractor=PostgresIncrementalExtractor(source_connection_factory),
             bronze_store=PostgresBronzeStore(warehouse_connection_factory),
             checkpoint_store=PostgresCheckpointStore(warehouse_connection_factory),
@@ -59,8 +54,6 @@ def shipments_dag():
     def validate_shipments():
         run_bronze_validation(
             data_source=DATA_SOURCE,
-            bronze_table=BRONZE_TABLE,
-            model=Shipment,
             bronze_store=PostgresBronzeStore(warehouse_connection_factory),
             checkpoint_store=PostgresCheckpointStore(warehouse_connection_factory),
             quarantine_store=PostgresQuarantineStore(warehouse_connection_factory),
