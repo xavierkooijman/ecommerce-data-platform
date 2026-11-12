@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Any
 
 import psycopg
+from pydantic import BaseModel
 
 from ecommerce_data_platform.validation.models import (
     Customer,
@@ -55,7 +56,7 @@ DATA_SOURCE_BRONZE_TABLES: dict[DataSource, BronzeTable] = {
     DataSource(SourceSystem.ECOMMERCE_DB, Resource.SHIPMENTS): BronzeTable.SHIPMENTS,
 }
 
-DATA_SOURCE_VALIDATION_MODELS = {
+DATA_SOURCE_VALIDATION_MODELS: dict[DataSource, type[BaseModel]] = {
     DataSource(SourceSystem.ECOMMERCE_DB, Resource.CUSTOMERS): Customer,
     DataSource(SourceSystem.ECOMMERCE_DB, Resource.PRODUCTS): Product,
     DataSource(SourceSystem.ECOMMERCE_DB, Resource.ORDERS): Order,

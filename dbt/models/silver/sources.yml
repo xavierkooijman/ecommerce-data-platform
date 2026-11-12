@@ -110,19 +110,21 @@ sources:
             tests:
               - not_null
               - unique
-          - name: source_table
-            description: "The source table from which the record originated."
+          - name: source_system
+            description: "The source system from which the record originated."
             tests:
               - not_null
+          - name: resource
+            description: "The resource of the record that was quarantined (e.g., customers, products, orders, order_items, shipments)."
+            tests:
+              - not_null
+          - name: resource_pk
+            description: "The primary key of the record in the source table."
           - name: ingestion_id
             description: "The ingestion_id of the record that was quarantined."
             tests:
               - not_null
               - unique
-          - name: source_pk
-            description: "The primary key of the record in the source table."
-            tests:
-              - not_null
           - name: errors
             description: "JSON of error messages describing why the record was quarantined."
             tests:

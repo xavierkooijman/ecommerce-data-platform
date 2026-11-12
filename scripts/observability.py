@@ -1,4 +1,5 @@
 import argparse
+import sys
 from functools import partial
 
 from ecommerce_data_platform.models import (
@@ -80,4 +81,4 @@ def main() -> None:
     return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

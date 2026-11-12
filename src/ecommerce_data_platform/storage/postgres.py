@@ -50,10 +50,9 @@ class PostgresBronzeStore:
             "SELECT ingestion_id, payload FROM {} WHERE ingestion_id > %s"
         ).format(sql.Identifier("bronze", table))
         with self._connection_factory() as conn:
-            with self._connection_factory() as conn:
-                with conn.cursor(row_factory=class_row(BronzeRecord)) as cur:
-                    cur.execute(query, (last_ingestion_id or 0,))
-                    return cur.fetchall()
+            with conn.cursor(row_factory=class_row(BronzeRecord)) as cur:
+                cur.execute(query, (last_ingestion_id or 0,))
+                return cur.fetchall()
 
 class PostgresCheckpointStore:
     def __init__(self, connection_factory: PostgresConnectionFactory) -> None:
