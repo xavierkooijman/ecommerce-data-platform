@@ -6,6 +6,9 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 
 import psycopg
+from dotenv import load_dotenv
+
+load_dotenv()
 
 REFERENCE_DATE = date(2026, 10, 31)
 

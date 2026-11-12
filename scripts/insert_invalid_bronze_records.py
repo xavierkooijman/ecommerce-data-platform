@@ -3,7 +3,10 @@ import os
 from datetime import UTC, datetime
 
 import psycopg
+from dotenv import load_dotenv
 from psycopg.types.json import Jsonb
+
+load_dotenv()
 
 
 def generate_invalid_records() -> dict[str, dict]:
